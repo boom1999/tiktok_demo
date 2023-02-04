@@ -1,0 +1,29 @@
+version: "2.2"
+
+services:
+  mysql:
+    image: "mysql:8.0.32"
+    container_name: tiktok_demo_mysql_8.0.32
+    volumes:
+      - $HOME/mysql/datadir:/var/lib/mysql
+      - $HOME/mysql/conf:/etc/mysql/conf.d
+      - $HOME/mysql/logs:/var/log/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=tiktok_demo
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=123456
+      - MYSQL_ROOT_PASSWORD=root
+      - CONTAINER_TIMEZONE=Asia/Shanghai
+  tiktok_demo:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./wait-for-it.sh:/apps/wait-for-it.sh
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    command: ["./wait-for-it.sh", "mysql:3306","--", "/apps/tiktok_demo" ]
