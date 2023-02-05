@@ -3,8 +3,6 @@
 
 ## Tiktok Demo
 
----
-
 ### *Updating*
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/boom1999/tiktok_demo??style=plastic)
@@ -74,3 +72,14 @@
 [license-shield]: https://img.shields.io/github/license/mrxuexi/tiktok.svg?style=flat-square
 
 [license-url]: https://github.com/boom1999/tiktok_demo/blob/master/LICENSE
+
+---
+- Step 1. Fork this repository
+- Step 2. Permission
+    ```shell
+    sudo chmod 777 wait-for-it.sh
+    ```
+- Step 3. Change your configs in `./config/config.yaml`
+- Step 4. Install `docker` and `docker-compose`
+- Step 5. `docker-compose up`
+- ---
