@@ -1,1 +1,60 @@
 package repository
+
+import (
+	"log"
+)
+
+// TableUser <---> User struct in mysql
+type TableUser struct {
+	Id       int64
+	Name     string
+	Password string
+}
+
+// TableName 修改映射名
+func (tableUser TableUser) TableName() string {
+	return "users"
+}
+
+// GetTableUserList 获取所有TableUser对象
+func GetTableUserList() ([]TableUser, error) {
+	var tableUsers []TableUser
+	err := DB.Find(&tableUsers).Error
+	if err != nil {
+		log.Println(err.Error())
+		return tableUsers, err
+	}
+	return tableUsers, nil
+}
+
+// GetTableUserByUserName 根据userName获取TableUser对象
+func GetTableUserByUserName(userName string) (TableUser, error) {
+	tableUser := TableUser{}
+	err := DB.Where("name = ?", userName).First(&tableUser).Error
+	if err != nil {
+		log.Println(err.Error())
+		return tableUser, err
+	}
+	return tableUser, nil
+}
+
+// GetTableUserByUserId 根据userId获取TableUser对象
+func GetTableUserByUserId(userId int64) (TableUser, error) {
+	tableUser := TableUser{}
+	err := DB.Where("id = ?", userId).First(&tableUser).Error
+	if err != nil {
+		log.Println(err.Error())
+		return tableUser, err
+	}
+	return tableUser, nil
+}
+
+// InsertTableUser 插入新用户
+func InsertTableUser(newUser *TableUser) bool {
+	err := DB.Create(&newUser).Error
+	if err != nil {
+		log.Println(err.Error())
+		return false
+	}
+	return true
+}

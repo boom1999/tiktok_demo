@@ -5,9 +5,9 @@ services:
     image: "mysql:8.0.32"
     container_name: tiktok_demo_mysql_8.0.32
     volumes:
-      - $HOME/mysql/datadir:/var/lib/mysql
-      - $HOME/mysql/conf:/etc/mysql/conf.d
-      - $HOME/mysql/logs:/var/log/mysql
+      - $HOME/tiktokCache/mysql/datadir:/var/lib/mysql
+      - $HOME/tiktokCache/mysql/conf:/etc/mysql/conf.d
+      - $HOME/tiktokCache/mysql/logs:/var/log/mysql
     ports:
       - "3306:3306"
     environment:

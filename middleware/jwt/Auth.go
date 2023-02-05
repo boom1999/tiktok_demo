@@ -1,12 +1,16 @@
 package jwt
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"net/http"
 	"tiktok_demo/config"
+	"tiktok_demo/service"
 	"time"
 )
 
@@ -25,13 +29,14 @@ type Claims struct {
 }
 
 // GenToken Generate token based on username
-func GenToken(userId int64, userName string) (string, error) {
-	fmt.Printf("generatetoken: %v\n", userId)
+func GenToken(userName string) (string, error) {
+	fmt.Printf("generatetoken: %v\n", userName)
+	u := service.UserService.GetTableUserByUserName(new(service.UserImpl), userName)
 	expiresTime := time.Now().Unix() + Conf.OneDayOfHours.OneDayOfHours
 	fmt.Printf("expiresTime: %v\n", expiresTime)
 	claims := Claims{
-		UserId:   userId,
-		UserName: userName,
+		UserId:   u.Id,
+		UserName: u.Name,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "tiktok_demo",
 			ExpiresAt: jwt.NewNumericDate(time.Unix(expiresTime, expiresTime).Local()),
@@ -122,4 +127,12 @@ func AuthWithoutLogin() gin.HandlerFunc {
 		}
 		ctx.Next()
 	}
+}
+
+// PswEnCode Encode the password of User
+func PswEnCode(password string) string {
+	h := hmac.New(sha256.New, []byte(password))
+	sha := hex.EncodeToString(h.Sum(nil))
+	fmt.Println("Result: " + sha)
+	return sha
 }
