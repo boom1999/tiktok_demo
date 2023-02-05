@@ -65,3 +65,9 @@ func LoadConfig() {
 func GetConfig() Configs {
 	return Config
 }
+
+const ValidComment = 0   //评论状态：有效
+const InvalidComment = 1 //评论状态：取消
+const DateTime = "2006-01-02 15:04:05"
+
+const DefaultRedisValue = -1 //redis中key对应的预设值，防脏读
