@@ -1,6 +1,9 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+	"github.com/spf13/viper"
+)
 
 type JWTConfig struct {
 	Secret string
@@ -31,11 +34,10 @@ var Config Configs
 
 // LoadConfig Configs contain Mysql config and other settings from ./config.yaml (using Viper).
 func LoadConfig() {
-	viper.SetConfigName("config")
-	viper.SetConfigFile("./config.yaml")
+	viper.SetConfigFile("./config/config.yaml")
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 	jwt := JWTConfig{
 		Secret: viper.GetString("jwt.secretKey"),

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"log"
 	"net/http"
 	"tiktok_demo/config"
 	"tiktok_demo/service"
@@ -36,7 +37,7 @@ func GenToken(userName string) (string, error) {
 	fmt.Printf("expiresTime: %v\n", expiresTime)
 	claims := Claims{
 		UserId:   u.Id,
-		UserName: u.Name,
+		UserName: u.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "tiktok_demo",
 			ExpiresAt: jwt.NewNumericDate(time.Unix(expiresTime, expiresTime).Local()),
@@ -47,10 +48,10 @@ func GenToken(userName string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(SecretKey))
 	if err == nil {
-		println("generate token success!\n")
+		log.Println("generate token success!\n")
 		return signedToken, nil
 	} else {
-		println("generate token fail\n")
+		log.Println("generate token fail\n")
 		return "", err
 	}
 }
@@ -100,7 +101,7 @@ func Auth() gin.HandlerFunc {
 				StatusMsg:  "Token Error",
 			})
 		} else {
-			fmt.Println("token good")
+			log.Println("token good")
 		}
 		ctx.Set("userId", userId)
 		ctx.Next()
@@ -133,6 +134,6 @@ func AuthWithoutLogin() gin.HandlerFunc {
 func PswEnCode(password string) string {
 	h := hmac.New(sha256.New, []byte(password))
 	sha := hex.EncodeToString(h.Sum(nil))
-	fmt.Println("Result: " + sha)
+	log.Println("Result: " + sha)
 	return sha
 }

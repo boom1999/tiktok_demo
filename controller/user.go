@@ -34,17 +34,19 @@ func Register(ctx *gin.Context) {
 	usi := service.UserImpl{}
 	u := usi.GetTableUserByUserName(userName)
 
-	if userName == u.Name {
+	if userName == u.Username {
 		ctx.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
 		newUser := repository.TableUser{
-			Name:     userName,
+			Username: userName,
 			Password: jwt.PswEnCode(password),
 		}
 		if usi.InsertTableUser(&newUser) != true {
-			println("Insert Data Fail")
+			log.Println("Insert Data Fail")
+		} else {
+			log.Println("Insert Data Success")
 		}
 		token, _ := jwt.GenToken(userName)
 		log.Println("registered Id: ", u.Id)
@@ -61,11 +63,11 @@ func Login(ctx *gin.Context) {
 	userName := ctx.Query("username")
 	password := ctx.Query("password")
 	encodedPassword := jwt.PswEnCode(password)
-	println("encodedPassword: ", encodedPassword)
+	log.Println("encodedPassword: ", encodedPassword)
 
 	usi := service.UserImpl{}
 	u := usi.GetTableUserByUserName(userName)
-	if u.Name == "" {
+	if u.Username == "" {
 		ctx.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User Doesn't Exist"},
 		})

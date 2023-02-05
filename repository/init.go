@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
 	"tiktok_demo/config"
 )
 
 var DB *gorm.DB
-var Conf = config.GetConfig()
 
-func Init() *gorm.DB {
+func Init() {
+	Conf := config.GetConfig()
 	host := Conf.Mysql.Host
 	port := Conf.Mysql.Port
 	database := Conf.Mysql.Database
@@ -30,7 +31,12 @@ func Init() *gorm.DB {
 	if err != nil {
 		panic("failed to connect database, err:" + err.Error())
 	}
-	return DB
+	err = DB.AutoMigrate(&TableUser{})
+	if err != nil {
+		log.Println("Create table failed")
+	} else {
+		log.Println("Create table succeed")
+	}
 }
 
 func GetDataBase() *gorm.DB {

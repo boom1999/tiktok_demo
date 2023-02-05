@@ -6,9 +6,9 @@ import (
 
 // TableUser <---> User struct in mysql
 type TableUser struct {
-	Id       int64
-	Name     string
-	Password string
+	Id       int64  `gorm:"column:id;not null;type:bigint(20) primary key auto_increment"`
+	Username string `gorm:"column:username;not null;type:varchar(255)"`
+	Password string `gorm:"column:password;not null;type:varchar(255)"`
 }
 
 // TableName 修改映射名
@@ -30,7 +30,7 @@ func GetTableUserList() ([]TableUser, error) {
 // GetTableUserByUserName 根据userName获取TableUser对象
 func GetTableUserByUserName(userName string) (TableUser, error) {
 	tableUser := TableUser{}
-	err := DB.Where("name = ?", userName).First(&tableUser).Error
+	err := DB.Where("username = ?", userName).First(&tableUser).Error
 	if err != nil {
 		log.Println(err.Error())
 		return tableUser, err

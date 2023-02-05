@@ -93,7 +93,7 @@ func (usi *UserImpl) GetUserById(id int64) (User, error) {
 	// .... Else 5 items needed to add
 	user = User{
 		Id:            id,
-		Name:          tableUser.Name,
+		Name:          tableUser.Username,
 		FollowCount:   0,
 		FollowerCount: 0,
 		IsFollow:      false,
@@ -124,7 +124,7 @@ func (usi *UserImpl) GetUserByIdWithCurId(id int64, curId int64) (User, error) {
 	// .... Else 5 items needed to add
 	user = User{
 		Id:            id,
-		Name:          tableUser.Name,
+		Name:          tableUser.Username,
 		FollowCount:   0,
 		FollowerCount: 0,
 		IsFollow:      false,

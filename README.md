@@ -65,8 +65,7 @@
 ├─ LICENSE
 ├─ main.go（主程序入口）
 ├─ README.md
-├─ wait-for-it.sh
-└─ video.go（视频处理）
+└─  wait-for-it.sh
 ```
 
 [license-shield]: https://img.shields.io/github/license/mrxuexi/tiktok.svg?style=flat-square
