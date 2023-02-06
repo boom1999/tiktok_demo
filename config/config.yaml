@@ -1,9 +1,9 @@
-ip: &ip
-  host: 192.168.254.129
+ip:
+  host: &host 192.168.254.129
 jwt:
   secret: tiktok_demo
 mysql:
-  host: *ip
+  host: *host
   port: 3306
   database: tiktok_demo
   username: user
@@ -14,6 +14,6 @@ OneDayOfHours:
   OneMonth: 2592000
   OneYear: 946080000
 redis:
-  host: *ip
+  host: *host
   port: 6379
   password: 123456
