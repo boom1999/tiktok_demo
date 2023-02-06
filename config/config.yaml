@@ -7,7 +7,7 @@ mysql:
   username: user
   password: 123456
 OneDayOfHours:
-  OneDayOfHours: 60 * 60 * 24
-  OneMinute: 60 * 1
-  OneMonth: 60 * 60 * 24 * 30
-  OneYear: 365 * 60 * 60 * 24
+  OneMinute: 60
+  OneDayOfHours: 86400
+  OneMonth: 2592000
+  OneYear: 946080000

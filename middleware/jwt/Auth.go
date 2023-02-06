@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"log"
@@ -15,32 +14,29 @@ import (
 	"time"
 )
 
-var Conf = config.GetConfig()
-var SecretKey = Conf.JWT.Secret
-
 type Response struct {
 	StatusCode int32  `json:"status_code"`
 	StatusMsg  string `json:"status_msg,omitempty"`
 }
 
 type Claims struct {
-	UserId   int64  `json:"user_id"`
-	UserName string `json:"user_name"`
+	UserId int64 `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
 // GenToken Generate token based on username
 func GenToken(userName string) (string, error) {
-	fmt.Printf("generatetoken: %v\n", userName)
+	var Conf = config.GetConfig()
+	var SecretKey = Conf.JWT.Secret
+	log.Println("generatorUserName: ", userName)
 	u := service.UserService.GetTableUserByUserName(new(service.UserImpl), userName)
 	expiresTime := time.Now().Unix() + Conf.OneDayOfHours.OneDayOfHours
-	fmt.Printf("expiresTime: %v\n", expiresTime)
+	expiresTimeUnix := time.Unix(expiresTime, 0).UTC()
 	claims := Claims{
-		UserId:   u.Id,
-		UserName: u.Username,
+		UserId: u.Id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "tiktok_demo",
-			ExpiresAt: jwt.NewNumericDate(time.Unix(expiresTime, expiresTime).Local()),
+			ExpiresAt: jwt.NewNumericDate(expiresTimeUnix),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
@@ -48,19 +44,23 @@ func GenToken(userName string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(SecretKey))
 	if err == nil {
-		log.Println("generate token success!\n")
+		log.Println("generate token succeed")
 		return signedToken, nil
 	} else {
-		log.Println("generate token fail\n")
+		log.Println("generate token failed")
 		return "", err
 	}
 }
 
 // ParseToken Parse the JWT token
 func ParseToken(token string) (*Claims, error) {
+	var SecretKey = config.GetConfig().JWT.Secret
 	jwtToken, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SecretKey), nil
 	})
+	if jwtToken.Claims.(*Claims).ExpiresAt.Unix() < time.Now().Unix() {
+		log.Println("token has expired")
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -134,6 +134,5 @@ func AuthWithoutLogin() gin.HandlerFunc {
 func PswEnCode(password string) string {
 	h := hmac.New(sha256.New, []byte(password))
 	sha := hex.EncodeToString(h.Sum(nil))
-	log.Println("Result: " + sha)
 	return sha
 }
