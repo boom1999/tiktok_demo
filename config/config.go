@@ -26,8 +26,8 @@ type RedisConfig struct {
 }
 
 type OneDayOfHoursConfig struct {
-	OneDayOfHours int64
 	OneMinute     int64
+	OneDayOfHours int64
 	OneMonth      int64
 	OneYear       int64
 }
@@ -61,7 +61,7 @@ func LoadConfig() {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 	jwt := JWTConfig{
-		Secret: viper.GetString("jwt.secretKey"),
+		Secret: viper.GetString("jwt.secret"),
 	}
 	mysql := MysqlConfig{
 		Host:     viper.GetString("mysql.host"),
