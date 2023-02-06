@@ -1,8 +1,10 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"github.com/spf13/viper"
+	"os"
 )
 
 type JWTConfig struct {
@@ -17,6 +19,12 @@ type MysqlConfig struct {
 	Password string
 }
 
+type RedisConfig struct {
+	Host     string
+	Port     string
+	Password string
+}
+
 type OneDayOfHoursConfig struct {
 	OneDayOfHours int64
 	OneMinute     int64
@@ -28,14 +36,27 @@ type Configs struct {
 	JWT           JWTConfig
 	Mysql         MysqlConfig
 	OneDayOfHours OneDayOfHoursConfig
+	Redis         RedisConfig
 }
 
 var Config Configs
 
+const configFile = "/config/config.yaml"
+
 // LoadConfig Configs contain Mysql config and other settings from ./config.yaml (using Viper).
 func LoadConfig() {
-	viper.SetConfigFile("./config/config.yaml")
-	err := viper.ReadInConfig()
+	currentDir, err := os.Getwd()
+	if err != nil {
+		panic(errors.New("Getwd() error"))
+	}
+	configPath := currentDir + configFile
+
+	if !fileExist(configPath) {
+		panic(errors.New("configFile not exist"))
+	}
+	viper.SetConfigName("config")
+	viper.SetConfigFile(configPath)
+	err = viper.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
@@ -55,15 +76,26 @@ func LoadConfig() {
 		OneMonth:      viper.GetInt64("OneDayOfHours.OneMonth"),
 		OneYear:       viper.GetInt64("OneDayOfHours.OneYear"),
 	}
+	redis := RedisConfig{
+		Host:     viper.GetString("redis.host"),
+		Port:     viper.GetString("redis.port"),
+		Password: viper.GetString("redis.password"),
+	}
 	Config = Configs{
 		JWT:           jwt,
 		Mysql:         mysql,
 		OneDayOfHours: OneDayOfHours,
+		Redis:         redis,
 	}
 }
 
 func GetConfig() Configs {
 	return Config
+}
+
+func fileExist(fileName string) bool {
+	_, err := os.Stat(fileName)
+	return err == nil || os.IsExist(err)
 }
 
 const ValidComment = 0   //评论状态：有效
