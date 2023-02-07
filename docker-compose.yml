@@ -16,6 +16,18 @@ services:
       - MYSQL_PASSWORD=123456
       - MYSQL_ROOT_PASSWORD=root
       - CONTAINER_TIMEZONE=Asia/Shanghai
+  minio:
+    image: 'minio/minio:latest'
+    container_name: tiktok_demo_latest
+    volumes:
+      - $HOME/tiktokCache/minio/data:/data
+    ports:
+      - "9000:9000" # api port
+      - "9001:9001" # control port
+    environment:
+      - MINIO_ROOT_USER=tiktokDemo
+      - MINIO_ROOT_PASSWORD=tiktokDemo@123456
+    command: minio server /data --console-address ":9001" --address ":9000"
   tiktok_demo:
     build:
       context: .

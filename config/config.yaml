@@ -13,6 +13,13 @@ OneDayOfHours:
   OneDayOfHours: 86400
   OneMonth: 2592000
   OneYear: 946080000
+minio:
+  host: *host
+  port: 9000
+  accessKeyId: tiktokDemo
+  secretAccessKey: tiktokDemo@123456
+  videoBuckets: video
+  picBuckets: pic
 redis:
   host: *host
   port: 6379

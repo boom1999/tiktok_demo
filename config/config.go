@@ -19,12 +19,6 @@ type MysqlConfig struct {
 	Password string
 }
 
-type RedisConfig struct {
-	Host     string
-	Port     string
-	Password string
-}
-
 type OneDayOfHoursConfig struct {
 	OneMinute     int64
 	OneDayOfHours int64
@@ -32,10 +26,26 @@ type OneDayOfHoursConfig struct {
 	OneYear       int64
 }
 
+type MinioConfig struct {
+	Host            string
+	Port            string
+	AccessKeyId     string
+	SecretAccessKey string
+	VideoBuckets    string
+	PicBuckets      string
+}
+
+type RedisConfig struct {
+	Host     string
+	Port     string
+	Password string
+}
+
 type Configs struct {
 	JWT           JWTConfig
 	Mysql         MysqlConfig
 	OneDayOfHours OneDayOfHoursConfig
+	Minio         MinioConfig
 	Redis         RedisConfig
 }
 
@@ -76,6 +86,14 @@ func LoadConfig() {
 		OneMonth:      viper.GetInt64("OneDayOfHours.OneMonth"),
 		OneYear:       viper.GetInt64("OneDayOfHours.OneYear"),
 	}
+	minio := MinioConfig{
+		Host:            viper.GetString("minio.host"),
+		Port:            viper.GetString("minio.port"),
+		AccessKeyId:     viper.GetString("minio.accessKeyId"),
+		SecretAccessKey: viper.GetString("minio.secretAccessKey"),
+		VideoBuckets:    viper.GetString("minio.videoBuckets"),
+		PicBuckets:      viper.GetString("minio.picBuckets"),
+	}
 	redis := RedisConfig{
 		Host:     viper.GetString("redis.host"),
 		Port:     viper.GetString("redis.port"),
@@ -85,8 +103,10 @@ func LoadConfig() {
 		JWT:           jwt,
 		Mysql:         mysql,
 		OneDayOfHours: OneDayOfHours,
+		Minio:         minio,
 		Redis:         redis,
 	}
+	fmt.Println(Config)
 }
 
 func GetConfig() Configs {
