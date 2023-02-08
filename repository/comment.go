@@ -27,7 +27,7 @@ func (Comment) TableName() string {
 // 1、使用video id 查询Comment数量
 func Count(videoId int64) (int64, error) {
 	log.Println("CommentDao-Count: running") //函数已运行
-	//Init()
+	//InitDataBase()
 	var count int64
 	//数据库中查询评论数量
 	err := DB.Model(Comment{}).Where(map[string]interface{}{"video_id": videoId, "cancel": config.ValidComment}).Count(&count).Error
@@ -39,7 +39,7 @@ func Count(videoId int64) (int64, error) {
 	return count, nil
 }
 
-//CommentIdList 根据视频id获取评论id 列表
+// CommentIdList 根据视频id获取评论id 列表
 func CommentIdList(videoId int64) ([]string, error) {
 	var commentIdList []string
 	err := DB.Model(Comment{}).Select("id").Where("video_id = ?", videoId).Find(&commentIdList).Error

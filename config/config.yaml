@@ -16,8 +16,8 @@ OneDayOfHours:
 minio:
   host: *host
   port: 9000
-  accessKeyId: tiktokDemo
-  secretAccessKey: tiktokDemo@123456
+  rootUser: tiktokDemo
+  rootPassword: tiktokDemo@123456
   videoBuckets: video
   picBuckets: pic
 redis:

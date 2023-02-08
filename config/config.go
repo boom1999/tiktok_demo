@@ -27,12 +27,12 @@ type OneDayOfHoursConfig struct {
 }
 
 type MinioConfig struct {
-	Host            string
-	Port            string
-	AccessKeyId     string
-	SecretAccessKey string
-	VideoBuckets    string
-	PicBuckets      string
+	Host         string
+	Port         string
+	RootUser     string
+	RootPassword string
+	VideoBuckets string
+	PicBuckets   string
 }
 
 type RedisConfig struct {
@@ -87,12 +87,12 @@ func LoadConfig() {
 		OneYear:       viper.GetInt64("OneDayOfHours.OneYear"),
 	}
 	minio := MinioConfig{
-		Host:            viper.GetString("minio.host"),
-		Port:            viper.GetString("minio.port"),
-		AccessKeyId:     viper.GetString("minio.accessKeyId"),
-		SecretAccessKey: viper.GetString("minio.secretAccessKey"),
-		VideoBuckets:    viper.GetString("minio.videoBuckets"),
-		PicBuckets:      viper.GetString("minio.picBuckets"),
+		Host:         viper.GetString("minio.host"),
+		Port:         viper.GetString("minio.port"),
+		RootUser:     viper.GetString("minio.rootUser"),
+		RootPassword: viper.GetString("minio.rootPassword"),
+		VideoBuckets: viper.GetString("minio.videoBuckets"),
+		PicBuckets:   viper.GetString("minio.picBuckets"),
 	}
 	redis := RedisConfig{
 		Host:     viper.GetString("redis.host"),
@@ -106,7 +106,6 @@ func LoadConfig() {
 		Minio:         minio,
 		Redis:         redis,
 	}
-	fmt.Println(Config)
 }
 
 func GetConfig() Configs {

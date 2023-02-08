@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"tiktok_demo/config"
+	"tiktok_demo/middleware/minio"
 	"tiktok_demo/repository"
 	"tiktok_demo/routes"
 )
@@ -14,11 +16,12 @@ func main() {
 	routes.CollectRoutes(r)
 	err := r.Run(":8080")
 	if err != nil {
-		return
+		log.Println("Start failed.")
 	}
 }
 
 func Init() {
 	config.LoadConfig()
-	repository.Init()
+	repository.InitDataBase()
+	minio.InitMinio()
 }

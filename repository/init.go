@@ -10,7 +10,7 @@ import (
 
 var DB *gorm.DB
 
-func Init() {
+func InitDataBase() {
 	Conf := config.GetConfig()
 	host := Conf.Mysql.Host
 	port := Conf.Mysql.Port
