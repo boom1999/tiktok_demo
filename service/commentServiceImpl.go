@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"sync"
 	"tiktok_demo/config"
-	"tiktok_demo/middleware/jwt/rabbitmq"
-	"tiktok_demo/middleware/jwt/redis"
+	"tiktok_demo/middleware/rabbitmq"
+	"tiktok_demo/middleware/redis"
 	"tiktok_demo/repository"
 	"time"
 )
@@ -95,7 +95,7 @@ func (c CommentServiceImpl) Send(comment repository.Comment) (CommentInfo, error
 		Content:    commentRtn.CommentText,
 		CreateDate: commentRtn.CreateDate.Format(config.DateTime),
 	}
-	//将此发表的评论id存入redis
+	// 将此发表的评论id存入redis
 	go func() {
 		insertRedisVideoCommentId(strconv.Itoa(int(comment.VideoId)), strconv.Itoa(int(commentRtn.Id)))
 		log.Println("send comment save in redis")
@@ -290,7 +290,7 @@ func (c CommentServiceImpl) GetList(videoId int64, userId int64) ([]CommentInfo,
 	return commentInfoList, nil
 }
 
-//在redis中存储video_id对应的comment_id 、 comment_id对应的video_id
+// 在redis中存储video_id对应的comment_id 、 comment_id对应的video_id
 func insertRedisVideoCommentId(videoId string, commentId string) {
 	//在redis-RdbVCid中存储video_id对应的comment_id
 	_, err := redis.RdbVCid.SAdd(redis.Ctx, videoId, commentId).Result()
@@ -306,7 +306,7 @@ func insertRedisVideoCommentId(videoId string, commentId string) {
 	}
 }
 
-//此函数用于给一个评论赋值：评论信息+用户信息 填充
+// 此函数用于给一个评论赋值：评论信息+用户信息 填充
 func oneComment(comment *CommentInfo, com *repository.Comment, userId int64) {
 	var wg sync.WaitGroup
 	wg.Add(1)
