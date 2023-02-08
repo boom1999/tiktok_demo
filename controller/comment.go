@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"tiktok_demo/repository"
 	"tiktok_demo/service"
-	"tiktok_demo/util"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -33,20 +32,20 @@ type CommentActionResponse struct {
 func CommentAction(c *gin.Context) {
 	log.Println("CommentController-Comment_Action: running") //函数已运行
 	//获取userId
-	id, _ := c.Get("userId")
-	userid, _ := id.(string)
-	userId, err := strconv.ParseInt(userid, 10, 64)
-	log.Printf("err:%v", err)
-	log.Printf("userId:%v", userId)
+	userId := c.GetInt64("userId")
+	//userid, _ := id.(string)
+	//userId, err := strconv.ParseInt(id, 10, 64)
+	//log.Printf("err:%v", err)
+	//log.Printf("userId:%v", userId)
 	//错误处理
-	if err != nil {
-		c.JSON(http.StatusOK, CommentActionResponse{
-			StatusCode: -1,
-			StatusMsg:  "comment userId json invalid",
-		})
-		log.Println("CommentController-Comment_Action: return comment userId json invalid") //函数返回userId无效
-		return
-	}
+	//if err != nil {
+	//	c.JSON(http.StatusOK, CommentActionResponse{
+	//		StatusCode: -1,
+	//		StatusMsg:  "comment userId json invalid",
+	//	})
+	//	log.Println("CommentController-Comment_Action: return comment userId json invalid") //函数返回userId无效
+	//	return
+	//}
 	//获取videoId
 	videoId, err := strconv.ParseInt(c.Query("video_id"), 10, 64)
 	//错误处理
@@ -73,8 +72,8 @@ func CommentAction(c *gin.Context) {
 	commentService := new(service.CommentServiceImpl)
 	if actionType == 1 { //actionType为1，则进行发表评论操作
 		content := c.Query("comment_text")
-		// 垃圾评论过滤。
-		content = util.Filter.Replace(content, '#')
+		// TODO 垃圾评论过滤。
+		// content = util.Filter.Replace(content, '#')
 		// find, _ := util.Filter.FindIn(content)
 		/*if find {
 			log.Println("垃圾评论")

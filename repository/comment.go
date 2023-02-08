@@ -19,7 +19,7 @@ type Comment struct {
 }
 
 // TableName 修改表名映射
-func (Comment) TableName() string {
+func (comment Comment) TableName() string {
 	return "comments"
 }
 
@@ -39,7 +39,7 @@ func Count(videoId int64) (int64, error) {
 	return count, nil
 }
 
-//CommentIdList 根据视频id获取评论id 列表
+// CommentIdList 根据视频id获取评论id 列表
 func CommentIdList(videoId int64) ([]string, error) {
 	var commentIdList []string
 	err := DB.Model(Comment{}).Select("id").Where("video_id = ?", videoId).Find(&commentIdList).Error
