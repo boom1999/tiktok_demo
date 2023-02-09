@@ -18,7 +18,7 @@ services:
       - CONTAINER_TIMEZONE=Asia/Shanghai
   minio:
     image: 'minio/minio:RELEASE.2022-01-04T07-41-07Z'
-    container_name: tiktok_demo_20220104
+    container_name: tiktok_demo_minio_20220104
     volumes:
       - $HOME/tiktokCache/minio/data:/data
       - $HOME/tiktokCache/minio/config:/root/.minio
@@ -29,6 +29,18 @@ services:
       - MINIO_ROOT_USER=tiktokDemo
       - MINIO_ROOT_PASSWORD=tiktokDemo@123456
     command: minio server /data --console-address ":9001" --address ":9000"
+  redis:
+    image: 'redis:6.0'
+    container_name: tiktok_demo_redis_6.0
+    volumes:
+      - $HOME/tiktokCache/redis/datadir:/data
+      - $HOME/tiktokCache/redis/conf/redis.conf:/etc/redis/redis.conf
+      - $HOME/tiktokCache/redis/logs:/logs
+    ports:
+      - "6379:6379"
+    environment:
+      - TZ="Asia/Shanghai"
+    command: "redis-server /etc/redis/redis.conf"
   tiktok_demo:
     build:
       context: .
@@ -39,4 +51,6 @@ services:
       - "8080:8080"
     depends_on:
       - mysql
+      - minio
+      - redis
     command: ["./wait-for-it.sh", "mysql:3306","--", "/apps/tiktok_demo" ]
