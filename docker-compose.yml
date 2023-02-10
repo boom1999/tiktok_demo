@@ -17,7 +17,7 @@ services:
       - MYSQL_ROOT_PASSWORD=root
       - CONTAINER_TIMEZONE=Asia/Shanghai
   minio:
-    image: 'minio/minio:RELEASE.2022-01-04T07-41-07Z'
+    image: "minio/minio:RELEASE.2022-01-04T07-41-07Z"
     container_name: tiktok_demo_minio_20220104
     volumes:
       - $HOME/tiktokCache/minio/data:/data
@@ -30,7 +30,7 @@ services:
       - MINIO_ROOT_PASSWORD=tiktokDemo@123456
     command: minio server /data --console-address ":9001" --address ":9000"
   redis:
-    image: 'redis:6.0'
+    image: "redis:6.0"
     container_name: tiktok_demo_redis_6.0
     volumes:
       - $HOME/tiktokCache/redis/datadir:/data
@@ -41,6 +41,21 @@ services:
     environment:
       - TZ="Asia/Shanghai"
     command: "redis-server /etc/redis/redis.conf"
+  rabbitmq:
+    image: "rabbitmq:3.9.13-management"
+    container_name: tiktok_demo_rabbitmq_3913m
+    hostname: rabbitmq_host
+    volumes:
+      - $HOME/tiktokCache/rabbitMQ/data:/var/lib/rabbitmq
+      - $HOME/tiktokCache/rabbitMQ/log:/var/log/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      TZ: Asia/Shanghai
+      RABBITMQ_DEFAULT_USER: tiktok
+      RABBITMQ_DEFAULT_PASS: tiktok
+
   tiktok_demo:
     build:
       context: .
@@ -53,4 +68,5 @@ services:
       - mysql
       - minio
       - redis
-    command: ["./wait-for-it.sh", "mysql:3306","--", "/apps/tiktok_demo" ]
+      - rabbitmq
+    command: ["./wait-for-it.sh", "mysql:3306","rabbitmq:5672","-t 45","--", "/apps/tiktok_demo" ]

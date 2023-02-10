@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"log"
 	"net/http"
+	"strconv"
 	"tiktok_demo/config"
 	"tiktok_demo/service"
 	"time"
@@ -20,7 +21,6 @@ type Response struct {
 }
 
 type Claims struct {
-	UserId int64 `json:"user_id"`
 	jwt.RegisteredClaims
 }
 
@@ -33,12 +33,12 @@ func GenToken(userName string) (string, error) {
 	expiresTime := time.Now().Unix() + Conf.OneDayOfHours.OneDayOfHours
 	expiresTimeUnix := time.Unix(expiresTime, 0).UTC()
 	claims := Claims{
-		UserId: u.Id,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "tiktok_demo",
 			ExpiresAt: jwt.NewNumericDate(expiresTimeUnix),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
+			ID:        strconv.FormatInt(u.Id, 10),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -71,15 +71,15 @@ func ParseToken(token string) (*Claims, error) {
 }
 
 // VerifyToken Verify the JWT token
-func VerifyToken(token string) (int64, error) {
+func VerifyToken(token string) (string, error) {
 	if token == "" {
-		return int64(0), nil
+		return string(rune(0)), nil
 	}
 	claims, err := ParseToken(token)
 	if err != nil {
-		return int64(0), err
+		return string(rune(0)), err
 	}
-	return claims.UserId, nil
+	return claims.ID, nil
 }
 
 // Auth Actions that require login
@@ -94,14 +94,14 @@ func Auth() gin.HandlerFunc {
 			})
 		}
 		userId, err := VerifyToken(token)
-		if err != nil || userId == int64(0) {
+		if err != nil || userId == "0" {
 			ctx.Abort()
 			ctx.JSON(http.StatusUnauthorized, Response{
 				StatusCode: -1,
 				StatusMsg:  "Token Error",
 			})
 		} else {
-			log.Println("token good")
+			log.Println("token good, userId: ", userId)
 		}
 		ctx.Set("userId", userId)
 		ctx.Next()
