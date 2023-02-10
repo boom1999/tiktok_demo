@@ -97,6 +97,7 @@ func (f *FollowMQ) Consumer() {
 	}
 
 	forever := make(chan bool)
+	log.Println(msgs)
 	switch f.queueName {
 	case "follow_add":
 		go f.consumerFollowAdd(msgs)

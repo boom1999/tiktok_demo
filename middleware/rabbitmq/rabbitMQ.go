@@ -6,8 +6,7 @@ import (
 	"log"
 )
 
-// TODO need to change MQURL
-const MQURL = "amqp://tiktok:tiktok@106.14.75.229:5672/"
+const MQURL = "amqp://tiktok:tiktok@192.168.254.129:5672/"
 
 type RabbitMQ struct {
 	conn  *amqp.Connection
@@ -38,5 +37,8 @@ func (r *RabbitMQ) failOnErr(err error, message string) {
 
 // 关闭mq通道和mq的连接。
 func (r *RabbitMQ) destroy() {
-	r.conn.Close()
+	err := r.conn.Close()
+	if err != nil {
+		return
+	}
 }
