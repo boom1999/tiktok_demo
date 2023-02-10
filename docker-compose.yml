@@ -69,4 +69,4 @@ services:
       - minio
       - redis
       - rabbitmq
-    command: ["./wait-for-it.sh", "mysql:3306","rabbitmq:5672","-t 30","--", "/apps/tiktok_demo" ]
+    command: ["./wait-for-it.sh", "mysql:3306","rabbitmq:5672","-t 45","--", "/apps/tiktok_demo" ]
