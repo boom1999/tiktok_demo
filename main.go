@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"tiktok_demo/config"
 	"tiktok_demo/middleware/minio"
@@ -31,5 +30,4 @@ func Init() {
 	redis.InitRedis()
 	rabbitmq.InitRabbitMQ()
 	rabbitmq.InitFollowRabbitMQ()
-	fmt.Println("测试like分支")
 }
