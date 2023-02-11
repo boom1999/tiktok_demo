@@ -3,8 +3,9 @@ package config
 import (
 	"errors"
 	"fmt"
-	"github.com/spf13/viper"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 type JWTConfig struct {
@@ -122,3 +123,11 @@ const InvalidComment = 1 //评论状态：取消
 const DateTime = "2006-01-02 15:04:05"
 
 const DefaultRedisValue = -1 //redis中key对应的预设值，防脏读
+
+const IsLike = 0     //点赞的状态
+const Unlike = 1     //取消赞的状态
+const LikeAction = 1 //点赞的行为
+const Attempts = 3   //操作数据库的最大尝试次数
+
+// VideoCount 每次获取视频流的数量
+const VideoCount = 5
