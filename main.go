@@ -1,10 +1,13 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"tiktok_demo/config"
+	"tiktok_demo/middleware/redis"
 	"tiktok_demo/repository"
 	"tiktok_demo/routes"
+	"tiktok_demo/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -21,4 +24,7 @@ func main() {
 func Init() {
 	config.LoadConfig()
 	repository.Init()
+	redis.InitRedis()
+	util.InitFilter()
+
 }
