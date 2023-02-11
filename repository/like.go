@@ -8,10 +8,10 @@ import (
 
 // Like 表的结构。
 type Like struct {
-	Id      int64 //自增主键
-	UserId  int64 //点赞用户id
-	VideoId int64 //视频id
-	Cancel  int8  //是否点赞，0为点赞，1为取消赞
+	Id      int64 `gorm:"column:id;not null;type:bigint(20) primary key auto_increment"`
+	UserId  int64 `gorm:"column:user_id;not null;type:bigint(20)"`
+	VideoId int64 `gorm:"column:video_id;not null;type:bigint(20)"`
+	Cancel  int8  `gorm:"column:cancel;not null;default:0;type:tinyint(4)"`
 }
 
 // TableName 修改表名映射
