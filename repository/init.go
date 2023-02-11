@@ -31,7 +31,8 @@ func InitDataBase() {
 	if err != nil {
 		panic("failed to connect database, err:" + err.Error())
 	}
-	err = DB.Set("gorm:table_options", "AUTO_INCREMENT=230209").AutoMigrate(&TableUser{}, &Follow{})
+	err = DB.Set("gorm:table_options", "AUTO_INCREMENT=230209").AutoMigrate(&TableUser{}, &Follow{}, &Like{})
+	err = DB.Set("gorm:table_options", "AUTO_INCREMENT=115").AutoMigrate(&TableVideo{})
 	if err != nil {
 		log.Println("Create table failed")
 	} else {
