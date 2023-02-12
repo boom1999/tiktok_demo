@@ -37,7 +37,6 @@ func GenToken(userName string) (string, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "tiktok_demo",
 			ExpiresAt: jwt.NewNumericDate(expiresTimeUnix),
-			// ExpiresAt: jwt.NewNumericDate(time.Now().Add(12 * time.Hour * time.Duration(1))), // 过期时间12小时,
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			ID:        strconv.FormatInt(u.Id, 10),
