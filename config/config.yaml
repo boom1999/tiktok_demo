@@ -6,7 +6,7 @@ mysql:
   host: *host
   port: 3306
   database: tiktok_demo
-  username: user
+  username: root
   password: 123456
 OneDayOfHours:
   OneMinute: 60
