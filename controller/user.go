@@ -52,7 +52,7 @@ func Register(ctx *gin.Context) {
 		log.Println("registered Id: ", u.Id)
 		ctx.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0, StatusMsg: "OK"},
-			UserId:   newUser.Id,
+			UserId:   u.Id,
 			Token:    token,
 		})
 	}
