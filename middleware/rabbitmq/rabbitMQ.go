@@ -2,11 +2,12 @@ package rabbitmq
 
 import (
 	"fmt"
-	"github.com/streadway/amqp"
 	"log"
+
+	"github.com/streadway/amqp"
 )
 
-const MQURL = "amqp://tiktok:tiktok@192.168.254.129:5672/"
+const MQURL = "amqp://admin:admin@127.0.0.1:5672/"
 
 type RabbitMQ struct {
 	conn  *amqp.Connection

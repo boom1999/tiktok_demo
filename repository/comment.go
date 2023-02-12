@@ -4,22 +4,21 @@ import (
 	"errors"
 	"log"
 	"tiktok_demo/config"
-	"time"
 )
 
 // Comment
 // 评论信息-数据库中的结构体
 type Comment struct {
-	Id          int64     //评论id
-	UserId      int64     //评论用户id
-	VideoId     int64     //视频id
-	CommentText string    //评论内容
-	CreateDate  time.Time //评论发布的日期mm-dd
-	Cancel      int32     //取消评论为1，发布评论为0
+	Id          int64  //评论id
+	UserId      int64  //评论用户id
+	VideoId     int64  //视频id
+	CommentText string //评论内容
+	CreateDate  string //评论发布的日期mm-dd
+	Cancel      int32  //取消评论为1，发布评论为0
 }
 
 // TableName 修改表名映射
-func (Comment) TableName() string {
+func (comment Comment) TableName() string {
 	return "comments"
 }
 
@@ -55,6 +54,7 @@ func CommentIdList(videoId int64) ([]string, error) {
 func InsertComment(comment Comment) (Comment, error) {
 	log.Println("CommentDao-InsertComment: running") //函数已运行
 	//数据库中插入一条评论信息
+
 	err := DB.Model(Comment{}).Create(&comment).Error
 	if err != nil {
 		log.Println("CommentDao-InsertComment: return create comment failed") //函数返回提示错误信息

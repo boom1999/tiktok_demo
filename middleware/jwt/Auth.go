@@ -5,14 +5,15 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v4"
 	"log"
 	"net/http"
 	"strconv"
 	"tiktok_demo/config"
 	"tiktok_demo/service"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type Response struct {
@@ -36,6 +37,7 @@ func GenToken(userName string) (string, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "tiktok_demo",
 			ExpiresAt: jwt.NewNumericDate(expiresTimeUnix),
+			// ExpiresAt: jwt.NewNumericDate(time.Now().Add(12 * time.Hour * time.Duration(1))), // 过期时间12小时,
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			ID:        strconv.FormatInt(u.Id, 10),

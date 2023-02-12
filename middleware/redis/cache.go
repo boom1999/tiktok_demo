@@ -2,8 +2,9 @@ package redis
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
 	"tiktok_demo/config"
+
+	"github.com/go-redis/redis/v8"
 )
 
 var Ctx = context.Background()
