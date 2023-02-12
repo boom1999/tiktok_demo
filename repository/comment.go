@@ -9,12 +9,12 @@ import (
 // Comment
 // 评论信息-数据库中的结构体
 type Comment struct {
-	Id          int64  //评论id
-	UserId      int64  //评论用户id
-	VideoId     int64  //视频id
-	CommentText string //评论内容
-	CreateDate  string //评论发布的日期mm-dd
-	Cancel      int32  //取消评论为1，发布评论为0
+	Id          int64  `gorm:"column:id;not null;type:bigint(20) primary key auto_increment"`
+	UserId      int64  `gorm:"column:user_id;not null;type:bigint(20)"`
+	VideoId     int64  `gorm:"column:video_id;not null;type:bigint(20)"`
+	CommentText string `gorm:"column:comment_text;not null;type:varchar(255)"`
+	CreateDate  string `gorm:"column:create_date;not null;type:varchar(255)"`
+	Cancel      int32  `gorm:"column:cancel;not null;default:0;type:int(20)"`
 }
 
 // TableName 修改表名映射
