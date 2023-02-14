@@ -3,11 +3,10 @@ package rabbitmq
 import (
 	"fmt"
 	"log"
+	"tiktok_demo/config"
 
 	"github.com/streadway/amqp"
 )
-
-const MQURL = "amqp://admin:admin@127.0.0.1:5672/"
 
 type RabbitMQ struct {
 	conn  *amqp.Connection
@@ -18,7 +17,10 @@ var Rmq *RabbitMQ
 
 // InitRabbitMQ 初始化RabbitMQ的连接和通道。
 func InitRabbitMQ() {
-
+	Config := config.GetConfig()
+	log.Println(Config)
+	MQURL := "amqp://" + Config.RabbitMQ.DefaultUser + ":" + Config.RabbitMQ.DefaultPass + "@" + Config.RabbitMQ.Host + ":" + Config.RabbitMQ.Port + "/"
+	log.Println(MQURL)
 	Rmq = &RabbitMQ{
 		mqurl: MQURL,
 	}
