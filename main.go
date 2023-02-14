@@ -8,7 +8,6 @@ import (
 	"tiktok_demo/middleware/redis"
 	"tiktok_demo/repository"
 	"tiktok_demo/routes"
-	"tiktok_demo/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,6 +32,5 @@ func Init() {
 	rabbitmq.InitFollowRabbitMQ()
 	rabbitmq.InitLikeRabbitMQ()
 	redis.InitRedis()
-	util.InitFilter()
 
 }

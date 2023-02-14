@@ -7,7 +7,6 @@ import (
 	"tiktok_demo/config"
 	"tiktok_demo/repository"
 	"tiktok_demo/service"
-	"tiktok_demo/util"
 
 	"time"
 
@@ -15,7 +14,6 @@ import (
 )
 
 // CommentListResponse
-// 评论列表返回参数
 type CommentListResponse struct {
 	StatusCode  int32                 `json:"status_code"`
 	StatusMsg   string                `json:"status_msg,omitempty"`
@@ -23,17 +21,15 @@ type CommentListResponse struct {
 }
 
 // CommentActionResponse
-// 发表评论返回参数
 type CommentActionResponse struct {
 	StatusCode int32               `json:"status_code"`
 	StatusMsg  string              `json:"status_msg,omitempty"`
 	Comment    service.CommentInfo `json:"comment"`
 }
 
-// CommentAction
-// 发表 or 删除评论 comment/action/
+// CommentAction comment/action/
 func CommentAction(c *gin.Context) {
-	log.Println("CommentController-Comment_Action: running") //函数已运行
+	log.Println("CommentController-Comment_Action: running")
 	//获取userId
 	id, _ := c.Get("userId")
 	userid, _ := id.(string)
@@ -75,19 +71,6 @@ func CommentAction(c *gin.Context) {
 	commentService := new(service.CommentServiceImpl)
 	if actionType == 1 { //actionType为1，则进行发表评论操作
 		content := c.Query("comment_text")
-		// TODO 垃圾评论过滤。
-		content = util.Filter.Replace(content, '#')
-		find, _ := util.Filter.FindIn(content)
-		if find {
-			log.Println("垃圾评论")
-			c.JSON(http.StatusOK, CommentActionResponse{
-				StatusCode: -1,
-				StatusMsg:  "垃圾评论",
-			})
-			return
-			content = "*****"
-		}
-
 		//发表评论数据准备
 		var sendComment repository.Comment
 		sendComment.UserId = userId
@@ -116,7 +99,7 @@ func CommentAction(c *gin.Context) {
 		})
 		log.Println("CommentController-Comment_Action: return Send success") //发表评论成功，返回正确信息
 		return
-	} else { //actionType为2，则进行删除评论操作
+	} else { //进行删除评论操作
 		//获取要删除的评论的id
 		commentId, err := strconv.ParseInt(c.Query("comment_id"), 10, 64)
 		if err != nil {
