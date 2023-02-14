@@ -78,6 +78,7 @@
     ```shell
     sudo chmod 777 wait-for-it.sh
     ```
+  maybe need to change it's format to unix(if not), `:set ff=unix`
 - Step 3. Change your configs in `./config/config.yaml`
 - Step 4. Install `docker` and `docker-compose`
 - Step 5. `docker-compose up`

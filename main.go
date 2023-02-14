@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"log"
 	"tiktok_demo/config"
 	"tiktok_demo/middleware/minio"
@@ -8,9 +9,6 @@ import (
 	"tiktok_demo/middleware/redis"
 	"tiktok_demo/repository"
 	"tiktok_demo/routes"
-	"tiktok_demo/util"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -33,6 +31,4 @@ func Init() {
 	rabbitmq.InitFollowRabbitMQ()
 	rabbitmq.InitLikeRabbitMQ()
 	redis.InitRedis()
-	util.InitFilter()
-
 }

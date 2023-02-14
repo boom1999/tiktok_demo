@@ -7,8 +7,6 @@ import (
 	"tiktok_demo/config"
 	"tiktok_demo/repository"
 	"tiktok_demo/service"
-	"tiktok_demo/util"
-
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -75,19 +73,6 @@ func CommentAction(c *gin.Context) {
 	commentService := new(service.CommentServiceImpl)
 	if actionType == 1 { //actionType为1，则进行发表评论操作
 		content := c.Query("comment_text")
-		// TODO 垃圾评论过滤。
-		content = util.Filter.Replace(content, '#')
-		find, _ := util.Filter.FindIn(content)
-		if find {
-			log.Println("垃圾评论")
-			c.JSON(http.StatusOK, CommentActionResponse{
-				StatusCode: -1,
-				StatusMsg:  "垃圾评论",
-			})
-			return
-			content = "*****"
-		}
-
 		//发表评论数据准备
 		var sendComment repository.Comment
 		sendComment.UserId = userId
