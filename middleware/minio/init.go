@@ -9,7 +9,7 @@ import (
 var minioClient *minio.Client
 
 // Minio 对象存储初始化
-func Init() {
+func InitMinio() {
 	var (
 		Conf                   = config.GetConfig()
 		MinioHost              = Conf.Minio.Host
