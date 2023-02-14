@@ -3,7 +3,6 @@ package minio
 import (
 	"context"
 	"github.com/minio/minio-go/v7"
-	"io"
 	"log"
 	"net/url"
 	"time"
@@ -57,20 +56,6 @@ func UploadLocalFile(bucketName string, objectName string, filePath string, cont
 	return info.Size, nil
 }
 
-// UploadFile 上传文件（提供reader）至 minio
-func UploadFile(bucketName string, objectName string, reader io.Reader, objectSize int64) error {
-	ctx := context.Background()
-	n, err := minioClient.PutObject(ctx, bucketName, objectName, reader, objectSize, minio.PutObjectOptions{
-		ContentType: "application/octet-stream",
-	})
-	if err != nil {
-		log.Printf("upload %s of size %d failed, %s", bucketName, objectSize, err)
-		return err
-	}
-	log.Printf("upload %s of bytes %d successfully", objectName, n.Size)
-	return nil
-}
-
 // GetFileUrl 从 minio 获取文件Url
 func GetFileUrl(bucketName string, fileName string, expires time.Duration) (*url.URL, error) {
 	ctx := context.Background()
@@ -83,15 +68,5 @@ func GetFileUrl(bucketName string, fileName string, expires time.Duration) (*url
 		log.Printf("get url of file %s from bucket %s failed, %s", fileName, bucketName, err)
 		return nil, err
 	}
-	// TODO: url可能要做截取
 	return presignedUrl, nil
-}
-
-// 删除对象
-func removeObject(bulkName string, objectName string) {
-	err := minioClient.RemoveObject(context.Background(), bulkName, objectName, minio.RemoveObjectOptions{})
-	if err != nil {
-		log.Fatalf("remove object eror " + err.Error())
-		return
-	}
 }
