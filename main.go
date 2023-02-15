@@ -30,5 +30,4 @@ func Init() {
 	rabbitmq.InitRabbitMQ()
 	rabbitmq.InitFollowRabbitMQ()
 	rabbitmq.InitLikeRabbitMQ()
-	redis.InitRedis()
 }
