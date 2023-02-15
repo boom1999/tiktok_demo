@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/u2takey/ffmpeg-go"
 	"io"
 	"log"
 	"mime/multipart"
@@ -198,47 +197,50 @@ func (videoService *VideoServiceImpl) creatVideo(video *Video, data *repository.
 	wg.Add(4)
 	var err error
 	video.TableVideo = *data
+	userService := new(UserImpl)
+	likeService := new(LikeServiceImpl)
+	commentService := new(CommentServiceImpl)
 	//插入Author，这里需要将视频的发布者和当前登录的用户传入，才能正确获得isFollow，
 	//如果出现错误，不能直接返回失败，将默认值返回，保证稳定
 	go func() {
-		video.Author, err = videoService.GetUserByIdWithCurId(data.AuthorId, userId)
+		video.Author, err = userService.GetUserByIdWithCurId(data.AuthorId, userId)
 		if err != nil {
-			log.Printf("方法videoService.GetUserByIdWithCurId(data.AuthorId, userId) 失败：%v", err)
+			log.Printf("方法userService.GetUserByIdWithCurId(data.AuthorId, userId) 失败：%v", err)
 		} else {
-			log.Printf("方法videoService.GetUserByIdWithCurId(data.AuthorId, userId) 成功")
+			log.Printf("方法userService.GetUserByIdWithCurId(data.AuthorId, userId) 成功")
 		}
 		wg.Done()
 	}()
 
 	//插入点赞数量，同上所示，不将nil直接向上返回，数据没有就算了，给一个默认就行了
 	go func() {
-		video.FavoriteCount, err = videoService.FavouriteCount(data.Id)
+		video.FavoriteCount, err = likeService.FavouriteCount(data.Id)
 		if err != nil {
-			log.Printf("方法videoService.FavouriteCount(data.ID) 失败：%v", err)
+			log.Printf("方法likeService.FavouriteCount(data.ID) 失败：%v", err)
 		} else {
-			log.Printf("方法videoService.FavouriteCount(data.ID) 成功")
+			log.Printf("方法likeService.FavouriteCount(data.ID) 成功")
 		}
 		wg.Done()
 	}()
 
 	//获取该视屏的评论数字
 	go func() {
-		video.CommentCount, err = videoService.CountFromVideoId(data.Id)
+		video.CommentCount, err = commentService.CountFromVideoId(data.Id)
 		if err != nil {
-			log.Printf("方法videoService.CountFromVideoId(data.ID) 失败：%v", err)
+			log.Printf("方法commentService.CountFromVideoId(data.ID) 失败：%v", err)
 		} else {
-			log.Printf("方法videoService.CountFromVideoId(data.ID) 成功")
+			log.Printf("方法commentService.CountFromVideoId(data.ID) 成功")
 		}
 		wg.Done()
 	}()
 
 	//获取当前用户是否点赞了该视频
 	go func() {
-		video.IsFavorite, err = videoService.IsFavourite(video.Id, userId)
+		video.IsFavorite, err = likeService.IsFavourite(video.Id, userId)
 		if err != nil {
-			log.Printf("方法videoService.IsFavourit(video.Id, userId) 失败：%v", err)
+			log.Printf("方法likeService.IsFavourit(video.Id, userId) 失败：%v", err)
 		} else {
-			log.Printf("方法videoService.IsFavourit(video.Id, userId) 成功")
+			log.Printf("方法likeService.IsFavourit(video.Id, userId) 成功")
 		}
 		wg.Done()
 	}()

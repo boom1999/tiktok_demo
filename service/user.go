@@ -17,6 +17,7 @@ type User struct {
 
 type UserImpl struct {
 	FollowService
+	LikeService
 }
 
 type UserService interface {
