@@ -146,7 +146,3 @@ const Attempts = 3   //操作数据库的最大尝试次数
 
 // VideoCount 每次获取视频流的数量
 const VideoCount = 5
-
-// 视频和图片的在本地的存放路径
-const VideoPath = "/tmp/file/video/"
-const PicPath = "/tmp/file/picture/"

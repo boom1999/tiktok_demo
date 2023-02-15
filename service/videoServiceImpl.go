@@ -1,11 +1,14 @@
 package service
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/u2takey/ffmpeg-go"
+	"io"
 	"log"
 	"mime/multipart"
-	"os/exec"
-	"path/filepath"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -77,42 +80,52 @@ func (videoService *VideoServiceImpl) Publish(data *multipart.FileHeader, userId
 		return err
 	}
 	defer video.Close()
+
 	log.Printf("方法data.Open() 成功")
 	//生成一个uuid作为视频的名字
 	//videoName := uuid.NewV4().String()
-	var videoName strings.Builder
+	var videoName, pictureName strings.Builder
 	videoName.WriteString(strconv.FormatInt(userId, 10))
 	videoName.WriteString("_")
 	videoName.WriteString(strconv.FormatInt(util.GetCurrentTimeMillisecond(), 10))
 	videoName.WriteString(".mp4")
-	log.Printf("生成视频名称%v", videoName)
-
-	videoPath := config.VideoPath + videoName.String()
+	pictureName.WriteString(strconv.FormatInt(userId, 10))
+	pictureName.WriteString("_")
+	pictureName.WriteString(strconv.FormatInt(util.GetCurrentTimeMillisecond(), 10))
+	pictureName.WriteString(".jpg")
+	log.Printf("生成视频名称%v,生成图片名称%v", videoName.String(), pictureName.String())
 	videoBucketName := config.Config.Minio.VideoBuckets
+	pictureBucketName := config.Config.Minio.PicBuckets
+	/*videoPath := config.VideoPath + videoName.String()
 	if err := c.SaveUploadedFile(data, videoPath); err != nil {
 		log.Printf("上传到临时地址%v", err)
 		return err
-	}
-	err = repository.FileMinio(videoBucketName, videoName.String(), videoPath, "mp4")
+	}*/
+	err = repository.FileMinio(videoBucketName, videoName.String(), video, "mp4", data.Size)
 	if err != nil {
 		log.Printf("方法repository.VideoMinio(video, videoName.String(), videoSize)%v", err)
 		return err
 	}
 	log.Printf("repository.VideoMinio(video, videoName.String(), videoSize)成功")
 
-	//获取视频第一帧
-	picName, err := GetImageFile(videoPath)
+	videoURL, err := repository.GetfileURL(videoBucketName, videoName.String())
 	if err != nil {
-		log.Printf("获取视频第一帧失败%v", err)
+		log.Printf("方法repository.GetfileURL(videoBucketName, videoName.String()) 失败%v", err)
+	}
+	videoplayURL := videoURL
+	videoplayURL.RawQuery = ""
+	//获取视频第一帧
+
+	buf, bufsize, err := Getimagestream(videoplayURL.String())
+	if err != nil {
+		log.Printf("获取视频第一帧数据流失败%v", err)
 		return err
 	}
-	log.Printf("获取视频第一帧成功%v", picName)
-	picPath := config.PicPath + picName
+	log.Printf("获取视频第一帧数据流成功%v", pictureName.String())
 
 	// TODO 在服务器上执行ffmpeg 从视频流中获取第一帧截图，并将图片上传到minio上
-	pictureBucketName := config.Config.Minio.PicBuckets
 
-	err = repository.FileMinio(pictureBucketName, picName, picPath, "jpg")
+	err = repository.FileMinio(pictureBucketName, pictureName.String(), buf, "jpg", bufsize)
 	if err != nil {
 		log.Printf("方法repository.VideoMinio(image, pictureName.String(), pictureBucketName, videoSize) 失败%v", err)
 		return err
@@ -124,15 +137,19 @@ func (videoService *VideoServiceImpl) Publish(data *multipart.FileHeader, userId
 		imageName,
 	}*/
 	//组装并持久化
-	videoURL, err := repository.GetfileURL(videoBucketName, videoName.String())
-	if err != nil {
-		log.Printf("方法repository.GetfileURL(videoBucketName, videoName.String()) 失败%v", err)
-	}
-	pictureURL, err := repository.GetfileURL(pictureBucketName, picName)
+
+	pictureURL, err := repository.GetfileURL(pictureBucketName, pictureName.String())
 	if err != nil {
 		log.Printf("方法repository.GetfileURL(pictureBucketName, pictureName.String()) 失败%v", err)
 	}
+
 	err = repository.Save(videoURL.String(), pictureURL.String(), userId, title)
+
+	pictureplayURL := pictureURL
+	pictureplayURL.RawQuery = ""
+
+	log.Printf("videplayURL:%v, pictureplayURL:%v", videoplayURL.String(), pictureplayURL.String())
+
 	if err != nil {
 		log.Printf("方法repository.Save(videoURL.String(), pictureURL.String(), userId, title) 失败%v", err)
 		return err
@@ -243,7 +260,7 @@ func (videoService *VideoServiceImpl) GetVideoIdList(authorId int64) ([]int64, e
 	return id, nil
 }
 
-func GetImageFile(videoPath string) (string, error) {
+/*func GetImageFile(videoPath string) (string, error) {
 	temp := strings.Split(videoPath, "/")
 	videoName := temp[len(temp)-1]
 	b := []byte(videoName)
@@ -257,4 +274,24 @@ func GetImageFile(videoPath string) (string, error) {
 	}
 
 	return videoName, nil
+}*/
+
+func Getimagestream(inputFile string) (io.Reader, int64, error) {
+	// 设置 FFmpeg 参数及运行
+
+	buf := bytes.NewBuffer(nil)
+	//s
+	err := ffmpeg_go.Input(inputFile).
+		Filter("select", ffmpeg_go.Args{fmt.Sprintf("gte(n,%d)", 5)}).
+		Output("pipe:", ffmpeg_go.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
+		WithOutput(buf, os.Stdout).
+		Run()
+
+	// 结果显示
+	if err != nil {
+		log.Fatalln("截取图片失败", err)
+		return buf, 0, err
+	}
+	log.Printf("截取图片成功")
+	return buf, int64(buf.Len()), nil
 }

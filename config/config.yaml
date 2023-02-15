@@ -1,13 +1,13 @@
 ip:
-  host: &host 192.168.254.129
+  host: &host 127.0.0.1
 jwt:
   secret: tiktok_demo
 mysql:
   host: *host
   port: 3306
   database: tiktok_demo
-  username: user
-  password: 123456
+  username: root
+  password: root
 OneDayOfHours:
   OneMinute: 60
   OneDayOfHours: 86400
