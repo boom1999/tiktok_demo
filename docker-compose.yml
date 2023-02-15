@@ -12,8 +12,8 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_DATABASE=tiktok_demo
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=123456
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
       - MYSQL_ROOT_PASSWORD=root
       - CONTAINER_TIMEZONE=Asia/Shanghai
   minio:
@@ -26,8 +26,8 @@ services:
       - "9000:9000" # api port
       - "9001:9001" # control port
     environment:
-      - MINIO_ROOT_USER=tiktokDemo
-      - MINIO_ROOT_PASSWORD=tiktokDemo@123456
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=123123123
     command: minio server /data --console-address ":9001" --address ":9000"
   redis:
     image: "redis:6.0"

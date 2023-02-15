@@ -1,5 +1,5 @@
 ip:
-  host: &host 127.0.0.1
+  host: &host 192.168.254.129
 jwt:
   secret: tiktok_demo
 mysql:
@@ -22,9 +22,9 @@ minio:
   picBuckets: pic
 rabbitMQ:
   host: *host
-  port: 5673
-  defaultUser: guest
-  defaultPass: guest
+  port: 5672
+  defaultUser: tiktok
+  defaultPass: tiktok
 redis:
   host: *host
   port: 6379
