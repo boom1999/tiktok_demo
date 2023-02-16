@@ -1,7 +1,5 @@
 FROM golang:1.19-alpine
 
-RUN "apt-get update && apt-get install ffmpeg -y"
-
 WORKDIR /apps
 
 COPY . .

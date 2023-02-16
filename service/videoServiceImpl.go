@@ -143,10 +143,9 @@ func (videoService *VideoServiceImpl) Publish(data *multipart.FileHeader, userId
 		log.Printf("方法repository.GetfileURL(pictureBucketName, pictureName.String()) 失败%v", err)
 	}
 
-	err = repository.Save(videoURL.String(), pictureURL.String(), userId, title)
-
 	pictureplayURL := pictureURL
 	pictureplayURL.RawQuery = ""
+	err = repository.Save(videoURL.String(), pictureplayURL.String(), userId, title)
 
 	log.Printf("videplayURL:%v, pictureplayURL:%v", videoplayURL.String(), pictureplayURL.String())
 
