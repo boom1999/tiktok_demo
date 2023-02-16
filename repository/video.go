@@ -70,9 +70,9 @@ func FileMinio(bucketName string, objectName string, file io.Reader, contentType
 	err := minio.UploadFile(bucketName, objectName, file, contentType, objectSize)
 	//_, err := minio.UploadLocalFile(bucketName, objectName, filePath, contentType)
 	if err != nil {
-		log.Println("上传%v类型%v至minio失败！！！", contentType, objectName)
+		log.Printf("上传%v类型%v至minio失败！！！", contentType, objectName)
 	} else {
-		log.Println("上传%v类型%v至minio成功！！！", contentType, objectName)
+		log.Printf("上传%v类型%v至minio成功！！！", contentType, objectName)
 	}
 	log.Println("上传成功！！！！！")
 	return nil
