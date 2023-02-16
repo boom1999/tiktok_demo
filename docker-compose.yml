@@ -12,8 +12,8 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_DATABASE=tiktok_demo
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=root
+      - MYSQL_USER=tiktokUser
+      - MYSQL_PASSWORD=tiktok123456
       - MYSQL_ROOT_PASSWORD=root
       - CONTAINER_TIMEZONE=Asia/Shanghai
   minio:
