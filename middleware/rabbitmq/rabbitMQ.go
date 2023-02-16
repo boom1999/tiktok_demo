@@ -18,7 +18,6 @@ var Rmq *RabbitMQ
 // InitRabbitMQ 初始化RabbitMQ的连接和通道。
 func InitRabbitMQ() {
 	Config := config.GetConfig()
-	log.Println(Config)
 	MQURL := "amqp://" + Config.RabbitMQ.DefaultUser + ":" + Config.RabbitMQ.DefaultPass + "@" + Config.RabbitMQ.Host + ":" + Config.RabbitMQ.Port + "/"
 	log.Println(MQURL)
 	Rmq = &RabbitMQ{

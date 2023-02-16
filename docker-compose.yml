@@ -61,7 +61,8 @@ services:
       context: .
       dockerfile: ./Dockerfile
     volumes:
-      - ./wait-for-it.sh:/apps/wait-for-it.sh
+      - ./wait-for-it.sh:/root/wait-for-it.sh
+      - ./config/config.yaml:/root/config/config.yaml
     ports:
       - "8080:8080"
     depends_on:
@@ -69,4 +70,3 @@ services:
       - minio
       - redis
       - rabbitmq
-    command: ["./wait-for-it.sh", "mysql:3306","rabbitmq:5672","-t 45","--", "/apps/tiktok_demo" ]
