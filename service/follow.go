@@ -168,30 +168,6 @@ func (*FollowImpl) AddFollowRelation(userId int64, targetId int64) (bool, error)
 	log.Println("消息打入成功。")
 	// 更新redis信息。
 	return updateRedisWithAdd(userId, targetId)
-	/*followDao := dao.NewFollowDaoInstance()
-	follow, err := followDao.FindEverFollowing(targetId, userId)
-	// 寻找SQL 出错。
-	if nil != err {
-		return false, err
-	}
-	// 曾经关注过，只需要update一下cancel即可。
-	if nil != follow {
-		_, err := followDao.UpdateFollowRelation(targetId, userId, 0)
-		// update 出错。
-		if nil != err {
-			return false, err
-		}
-		// update 成功。
-		return true, nil
-	}
-	// 曾经没有关注过，需要插入一条关注关系。
-	_, err = followDao.InsertFollowRelation(targetId, userId)
-	if nil != err {
-		// insert 出错
-		return false, err
-	}
-	// insert 成功。
-	return true, nil*/
 }
 
 // 添加关注时，设置Redis
@@ -234,24 +210,6 @@ func (*FollowImpl) DeleteFollowRelation(userId int64, targetId int64) (bool, err
 	log.Println("消息打入成功。")
 	// 更新redis信息。
 	return updateRedisWithDel(userId, targetId)
-	/*followDao := dao.NewFollowDaoInstance()
-	follow, err := followDao.FindEverFollowing(targetId, userId)
-	// 寻找 SQL 出错。
-	if nil != err {
-		return false, err
-	}
-	// 曾经关注过，只需要update一下cancel即可。
-	if nil != follow {
-		_, err := followDao.UpdateFollowRelation(targetId, userId, 1)
-		// update 出错。
-		if nil != err {
-			return false, err
-		}
-		// update 成功。
-		return true, nil
-	}
-	// 没有关注关系
-	return false, nil*/
 }
 
 // 当取关时，更新redis里的信息
@@ -321,41 +279,6 @@ func (f *FollowImpl) getFollowing(userId int64) ([]User, error) {
 // GetFollowing 根据当前用户id来查询他的关注者列表。
 func (f *FollowImpl) GetFollowing(userId int64) ([]User, error) {
 	return getFollowing(userId)
-	/*// 先查Redis，看是否有全部关注信息。
-	followingIdStr := strconv.Itoa(int(userId))
-	if cnt, _ := middleware.RdbFollowers.SCard(middleware.Ctx, followingIdStr).Result(); 0 == cnt {
-		users, _ := f.getFollowing(userId)
-
-		go setRedisFollowing(userId, users)
-
-		return users, nil
-	}
-	// Redis中有。
-	UserIdStr := strconv.Itoa(int(userId))
-	userIds, _ := middleware.RdbFollowing.SMembers(middleware.Ctx, UserIdStr).Result()
-	len := len(userIds)
-	if len > 0 {
-		len -= 1
-	}
-	users := make([]User, len)
-	wg := sync.WaitGroup{}
-	wg.Add(len)
-	i, j := 0, 0
-	for ; i < len; j++ {
-		idx, _ := strconv.Atoi(userIds[j])
-		if idx == -1 {
-			continue
-		}
-		go func(i int, idx int) {
-			defer wg.Done()
-			users[i], _ = f.GetUserByIdWithCurId(int64(idx), userId)
-		}(i, idx)
-
-		i++
-	}
-	wg.Wait()
-	log.Println("从Redis中查询到所有关注者。")
-	return users, nil*/
 }
 
 // 设置Redis关于所有关注的信息。
