@@ -17,6 +17,7 @@ type User struct {
 
 type UserImpl struct {
 	FollowService
+	LikeService
 }
 
 type UserService interface {
@@ -91,7 +92,7 @@ func (usi *UserImpl) GetUserById(id int64) (User, error) {
 	} else {
 		log.Println("Query User Success")
 	}
-	// .... Else 5 items needed to add
+	// TODO Else 5 items needed to add
 	user = User{
 		Id:            id,
 		Name:          tableUser.Username,
@@ -122,7 +123,7 @@ func (usi *UserImpl) GetUserByIdWithCurId(id int64, curId int64) (User, error) {
 	} else {
 		log.Println("Query User Success")
 	}
-	// .... Else 5 items needed to add
+	// TODO Else 5 items needed to add
 	user = User{
 		Id:            id,
 		Name:          tableUser.Username,

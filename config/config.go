@@ -42,12 +42,20 @@ type RedisConfig struct {
 	Password string
 }
 
+type RabbitMQConfig struct {
+	Host        string
+	Port        string
+	DefaultUser string
+	DefaultPass string
+}
+
 type Configs struct {
 	JWT           JWTConfig
 	Mysql         MysqlConfig
 	OneDayOfHours OneDayOfHoursConfig
 	Minio         MinioConfig
 	Redis         RedisConfig
+	RabbitMQ      RabbitMQConfig
 }
 
 var Config Configs
@@ -100,12 +108,19 @@ func LoadConfig() {
 		Port:     viper.GetString("redis.port"),
 		Password: viper.GetString("redis.password"),
 	}
+	rabbitMQ := RabbitMQConfig{
+		Host:        viper.GetString("rabbitMQ.host"),
+		Port:        viper.GetString("rabbitMQ.port"),
+		DefaultUser: viper.GetString("rabbitMQ.defaultUser"),
+		DefaultPass: viper.GetString("rabbitMQ.defaultPass"),
+	}
 	Config = Configs{
 		JWT:           jwt,
 		Mysql:         mysql,
 		OneDayOfHours: OneDayOfHours,
 		Minio:         minio,
 		Redis:         redis,
+		RabbitMQ:      rabbitMQ,
 	}
 }
 
@@ -131,7 +146,3 @@ const Attempts = 3   //操作数据库的最大尝试次数
 
 // VideoCount 每次获取视频流的数量
 const VideoCount = 5
-
-// 视频和图片的在本地的存放路径
-const VideoPath = "/tmp/file/video/"
-const PicPath = "/tmp/file/picture/"

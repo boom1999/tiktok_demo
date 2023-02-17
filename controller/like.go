@@ -20,7 +20,7 @@ type GetFavouriteListResponse struct {
 	VideoList  []service.Video `json:"video_list,omitempty"`
 }
 
-// FavoriteAction 点赞或者取消赞操作;
+// 点赞或者取消赞操作;
 func FavoriteAction(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
 	strVideoId := c.Query("video_id")
@@ -45,6 +45,26 @@ func FavoriteAction(c *gin.Context) {
 	}
 }
 
-// GetFavouriteList 获取点赞列表;
+// 获取点赞列表;
 func GetFavouriteList(c *gin.Context) {
+	strUserId := c.Query("user_id")
+	strCurId := c.GetString("userId")
+	userId, _ := strconv.ParseInt(strUserId, 10, 64)
+	curId, _ := strconv.ParseInt(strCurId, 10, 64)
+	likeService := new(service.LikeServiceImpl)
+	videos, err := likeService.GetFavouriteList(userId, curId)
+	if err == nil {
+		log.Printf("方法likeService.GetFavouriteList(userid) 成功")
+		c.JSON(http.StatusOK, GetFavouriteListResponse{
+			StatusCode: 0,
+			StatusMsg:  "get favouriteList success",
+			VideoList:  videos,
+		})
+	} else {
+		log.Printf("方法likeService.GetFavouriteList(userid) 失败：%v", err)
+		c.JSON(http.StatusOK, GetFavouriteListResponse{
+			StatusCode: 1,
+			StatusMsg:  "get favouriteList fail ",
+		})
+	}
 }

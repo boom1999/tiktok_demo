@@ -3,6 +3,7 @@ package minio
 import (
 	"context"
 	"github.com/minio/minio-go/v7"
+	"io"
 	"log"
 	"net/url"
 	"time"
@@ -42,7 +43,7 @@ func CreateBucket(bucketName string) error {
 	return nil
 }
 
-// UploadLocalFile 上传本地文件（提供文件路径）至 minio
+/*// UploadLocalFile 上传本地文件（提供文件路径）至 minio
 func UploadLocalFile(bucketName string, objectName string, filePath string, contentType string) (int64, error) {
 	ctx := context.Background()
 	info, err := minioClient.FPutObject(ctx, bucketName, objectName, filePath, minio.PutObjectOptions{
@@ -54,6 +55,20 @@ func UploadLocalFile(bucketName string, objectName string, filePath string, cont
 	}
 	log.Printf("upload %s of size %d successfully", objectName, info.Size)
 	return info.Size, nil
+}*/
+
+// UploadFile 上传文件（提供reader）至 minio
+func UploadFile(bucketName string, objectName string, reader io.Reader, contentType string, objectSize int64) error {
+	ctx := context.Background()
+	n, err := minioClient.PutObject(ctx, bucketName, objectName, reader, objectSize, minio.PutObjectOptions{
+		ContentType: contentType,
+	})
+	if err != nil {
+		log.Printf("upload %s of size %d failed, %s", bucketName, objectSize, err)
+		return err
+	}
+	log.Printf("upload %s of bytes %d successfully", objectName, n.Size)
+	return nil
 }
 
 // GetFileUrl 从 minio 获取文件Url

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"io"
 	"log"
 	"net/url"
 	"tiktok_demo/config"
@@ -64,16 +65,16 @@ func GetVideosByLastTime(lastTime time.Time) ([]TableVideo, error) {
 
 // FileMinio
 // 上传文件到minio
-func FileMinio(bucketName string, objectName string, filePath string, contentType string) error {
+func FileMinio(bucketName string, objectName string, file io.Reader, contentType string, objectSize int64) error {
 	//转到minio相对路线下
-	//err := minio.UploadFile(bucketName, objectName, file, objectSize)
-	_, err := minio.UploadLocalFile(bucketName, objectName, filePath, contentType)
+	err := minio.UploadFile(bucketName, objectName, file, contentType, objectSize)
+	//_, err := minio.UploadLocalFile(bucketName, objectName, filePath, contentType)
 	if err != nil {
-		log.Println("转到路径video失败！！！")
+		log.Printf("上传%v类型%v至minio失败！！！", contentType, objectName)
 	} else {
-		log.Println("转到路径video成功！！！")
+		log.Printf("上传%v类型%v至minio成功！！！", contentType, objectName)
 	}
-	log.Println("上传视频成功！！！！！")
+	log.Println("上传成功！！！！！")
 	return nil
 }
 
@@ -87,24 +88,6 @@ func GetfileURL(bucketName string, fileName string) (*url.URL, error) {
 	}
 	return fileURL, err
 }
-
-// ImageFTP
-// 将图片传入FTP服务器中，但是这里要注意图片的格式随着名字一起给,同时调用时需要自己结束流
-//func ImageFTP(file io.Reader, imageName string) error {
-//	//转到video相对路线下
-//	err := ftp.MyFTP.Cwd("images")
-//	if err != nil {
-//		log.Println("转到路径images失败！！！")
-//		return err
-//	}
-//	log.Println("转到路径images成功！！！")
-//	if err = ftp.MyFTP.Stor(imageName, file); err != nil {
-//		log.Println("上传图片失败！！！！！")
-//		return err
-//	}
-//	log.Println("上传图片成功！！！！！")
-//	return nil
-//}
 
 // Save 保存视频记录
 func Save(videoURL string, pictureURL string, userId int64, title string) error {

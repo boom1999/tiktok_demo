@@ -17,15 +17,14 @@ type CommentServiceImpl struct {
 }
 
 // CountFromVideoId
-// 1、使用video id 查询Comment数量
 func (c CommentServiceImpl) CountFromVideoId(videoId int64) (int64, error) {
 	//先在缓存中查
 	cnt, err := redis.RdbVCid.SCard(redis.Ctx, strconv.FormatInt(videoId, 10)).Result()
-	if err != nil { //若查询缓存出错，则打印log
-		//return 0, err
+	if err != nil {
 		log.Println("count from redis error:", err)
 	}
 	log.Println("comment count redis :", cnt)
+
 	//1.缓存中查到了数量，则返回数量值-1（去除0值）
 	if cnt != 0 {
 		return cnt - 1, nil
@@ -37,23 +36,19 @@ func (c CommentServiceImpl) CountFromVideoId(videoId int64) (int64, error) {
 		log.Println("comment count dao err:", err1)
 		return 0, nil
 	}
-	//将评论id切片存入redis-第一次存储 V-C set 值：
+	//将评论id切片存入redis
 	go func() {
-		//查询评论id list
 		cList, _ := repository.CommentIdList(videoId)
-		//先在redis中存储一个-1值，防止脏读
 		_, _err := redis.RdbVCid.SAdd(redis.Ctx, strconv.Itoa(int(videoId)), config.DefaultRedisValue).Result()
-		if _err != nil { //若存储redis失败，则直接返回
+		if _err != nil {
 			log.Println("redis save one vId - cId 0 failed")
 			return
 		}
-		//设置key值过期时间
 		_, err := redis.RdbVCid.Expire(redis.Ctx, strconv.Itoa(int(videoId)),
 			time.Duration(config.Config.OneDayOfHours.OneMonth)*time.Second).Result()
 		if err != nil {
 			log.Println("redis save one vId - cId expire failed")
 		}
-		//评论id循环存入redis
 		for _, commentId := range cList {
 			insertRedisVideoCommentId(strconv.Itoa(int(videoId)), commentId)
 		}
@@ -64,10 +59,8 @@ func (c CommentServiceImpl) CountFromVideoId(videoId int64) (int64, error) {
 }
 
 // Send
-// 2、发表评论
 func (c CommentServiceImpl) Send(comment repository.Comment) (CommentInfo, error) {
 	log.Println("CommentService-Send: running") //函数已运行
-	//数据准备
 	var commentInfo repository.Comment
 	commentInfo.VideoId = comment.VideoId         //评论视频id传入
 	commentInfo.UserId = comment.UserId           //评论用户id传入
@@ -75,12 +68,11 @@ func (c CommentServiceImpl) Send(comment repository.Comment) (CommentInfo, error
 	commentInfo.Cancel = config.ValidComment      //评论状态，0，有效
 	commentInfo.CreateDate = comment.CreateDate   //评论时间
 
-	//1.评论信息存储：
 	commentRtn, err := repository.InsertComment(commentInfo)
 	if err != nil {
 		return CommentInfo{}, err
 	}
-	//2.查询用户信息
+
 	impl := UserImpl{
 		FollowService: &FollowImpl{},
 	}
@@ -88,14 +80,14 @@ func (c CommentServiceImpl) Send(comment repository.Comment) (CommentInfo, error
 	if err2 != nil {
 		return CommentInfo{}, err2
 	}
-	//3.拼接
+
 	commentData := CommentInfo{
 		Id:         commentRtn.Id,
 		UserInfo:   userData,
 		Content:    commentRtn.CommentText,
 		CreateDate: commentRtn.CreateDate,
 	}
-	// 将此发表的评论id存入redis
+
 	go func() {
 		insertRedisVideoCommentId(strconv.Itoa(int(comment.VideoId)), strconv.Itoa(int(commentRtn.Id)))
 		log.Println("send comment save in redis")
@@ -105,7 +97,6 @@ func (c CommentServiceImpl) Send(comment repository.Comment) (CommentInfo, error
 }
 
 // DelComment
-// 3、删除评论，传入评论id
 func (c CommentServiceImpl) DelComment(commentId int64) error {
 	log.Println("CommentService-DelComment: running") //函数已运行
 	//1.先查询redis，若有则删除，返回客户端-再go协程删除数据库；无则在数据库中删除，返回客户端。
@@ -129,7 +120,6 @@ func (c CommentServiceImpl) DelComment(commentId int64) error {
 		}
 		log.Println("del comment in Redis success:", del1, del2) //del1、del2代表删除了几条数据
 
-		//使用mq进行数据库中评论的删除-评论状态更新
 		//评论id传入消息队列
 		rabbitmq.RmqCommentDel.Publish(strconv.FormatInt(commentId, 10))
 		return nil
@@ -139,11 +129,10 @@ func (c CommentServiceImpl) DelComment(commentId int64) error {
 }
 
 // GetList
-// 4、查看评论列表-返回评论list
 func (c CommentServiceImpl) GetList(videoId int64, userId int64) ([]CommentInfo, error) {
 	log.Println("CommentService-GetList: running") //函数已运行
 
-	//法一：调用dao，先查评论，再循环查用户信息：
+	//先查评论，再循环查用户信息：
 	//1.先查询评论列表信息
 	commentList, err := repository.GetCommentList(videoId)
 	if err != nil {
@@ -177,7 +166,6 @@ func (c CommentServiceImpl) GetList(videoId int64, userId int64) ([]CommentInfo,
 	wg.Wait()
 	//评论排序-按照主键排序
 	sort.Sort(CommentSlice(commentInfoList))
-	//------------------------结束----------------------------
 
 	//协程查询redis中是否有此记录，无则将评论id切片存入redis
 	go func() {
@@ -231,7 +219,7 @@ func insertRedisVideoCommentId(videoId string, commentId string) {
 	}
 }
 
-// 此函数用于给一个评论赋值：评论信息+用户信息 填充
+// 此函数用于给评论赋值：
 func oneComment(comment *CommentInfo, com *repository.Comment, userId int64) {
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -251,7 +239,7 @@ func oneComment(comment *CommentInfo, com *repository.Comment, userId int64) {
 	wg.Wait()
 }
 
-// CommentSlice 此变量以及以下三个函数都是做排序-准备工作
+// CommentSlice 排序准备工作
 type CommentSlice []CommentInfo
 
 func (a CommentSlice) Len() int { //重写Len()方法

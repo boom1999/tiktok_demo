@@ -1,14 +1,15 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"tiktok_demo/controller"
 	"tiktok_demo/middleware/jwt"
+	"github.com/gin-gonic/gin"
 )
 
 func CollectRoutes(r *gin.Engine) *gin.Engine {
 	tiktok := r.Group("/douyin")
 	{
+
 		tiktok.GET("/feed/", jwt.AuthWithoutLogin(), controller.Feed)
 		User(tiktok)
 		Publish(tiktok)

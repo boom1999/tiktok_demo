@@ -487,7 +487,8 @@ func (like *LikeServiceImpl) GetFavouriteList(userId int64, curId int64) ([]Vide
 func (like *LikeServiceImpl) addFavouriteVideoList(videoId int64, curId int64, favoriteVideoList *[]Video, wg *sync.WaitGroup) {
 	defer wg.Done()
 	//调用videoService接口，GetVideo：根据videoId，当前用户id:curId，返回Video类型对象
-	video, err := like.GetVideo(videoId, curId)
+	videoService := new(VideoServiceImpl)
+	video, err := videoService.GetVideo(videoId, curId)
 	//如果没有获取这个video_id的视频，视频可能被删除了,打印异常,并且不加入此视频
 	if err != nil {
 		log.Println(errors.New("this favourite video is miss"))
@@ -597,15 +598,4 @@ func (like *LikeServiceImpl) addVideoLikeCount(videoId int64, videoLikeCountList
 		return
 	}
 	*videoLikeCountList = append(*videoLikeCountList, count)
-}
-
-// GetLikeService 解决likeService调videoService,videoService调userService,useService调likeService循环依赖的问题
-func GetLikeService() LikeServiceImpl {
-	// var userService UserImpl
-	// var videoService VideoServiceImpl
-	var likeService LikeServiceImpl
-	// userService.LikeService = &likeService
-	// likeService.VideoService = &videoService
-	// videoService.UserService = &userService
-	return likeService
 }
