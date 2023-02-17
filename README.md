@@ -12,9 +12,18 @@
 [![MIT License][license-shield]][license-url]
 
 ![golang](https://img.shields.io/badge/golang-1.19-blue)
-![golang](https://img.shields.io/badge/gorm-1.8.2-red)
-![golang](https://img.shields.io/badge/gorm-1.24.5-green)
-![golang](https://img.shields.io/badge/viper-1.15.0-orange")
+![gin](https://img.shields.io/badge/gin-1.8-red)
+![gorm](https://img.shields.io/badge/gorm-1.24-green)
+![viper](https://img.shields.io/badge/viper-1.15-orange)
+![jwt](https://img.shields.io/badge/jwt-4.0-yellowgreen)
+![ffmpeg](https://img.shields.io/badge/ffmpeg-0.4-brightgreen)
+![docker_compose](https://img.shields.io/badge/docker_compose-2.2-lightgrey)
+
+
+![golang](https://img.shields.io/badge/mysql-8.0-blueviolet)
+![golang](https://img.shields.io/badge/redis-6.0-ff69b4)
+![golang](https://img.shields.io/badge/minio-7.0-9cf)
+![golang](https://img.shields.io/badge/rabbitMQ-3.9-orange)
 
 ---
 ```
@@ -84,7 +93,7 @@
 ---
 > In order to make data portable and reusable, we use **volumes** to mount docker data.
 > 
-> Before that, please open each **port** of the corresponding service.
+> Before that, please open each **port** of the corresponding service in firewalld and securityGroup.
 
 - Step 1. Fork this repository
   ``` shell
@@ -138,7 +147,6 @@
 ```shell
 docker image prune
 ```
-
-> If you are deploying on a remote **ECS** instead of a **virtual machine** and want to connect through tools such as _Navicat_,
-> please make sure that mysql has enabled the remote connection permission for the _user_ or _root_ and FirewallD port 3306 
-> (if not enabled, it will not affect data reading and writing).
+- For mysql connection
+  > If you are deploying on a remote **ECS** instead of a **virtual machine** and want to connect through tools such as _Navicat_,
+  > please make sure that mysql has enabled the remote connection permission for the _user_ or _root_(if not enabled, it will not affect data reading and writing).
