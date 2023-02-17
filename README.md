@@ -99,7 +99,7 @@
   - Start docker service: `systemctl start docker`
   - Download `docker-compose`
     ```shell
-    `docker compose`: `curl -L "https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    curl -L "https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     ```
   - Read and write permission: `chmod -R 777 /usr/local/bin/docker-compose`
 - Step 4. File permission 
@@ -130,11 +130,15 @@
   ```
 **Tips:**
 
-- Stop and delete the container
+- Delete all the containers
 ```shell
-docker stop $(docker ps -q) & docker rm $(docker ps -aq)
+ docker rm $(docker ps -a -q)
 ```
 - Remove `none` image
 ```shell
 docker image prune
 ```
+
+> If you are deploying on a remote **ECS** instead of a **virtual machine** and want to connect through tools such as _Navicat_,
+> please make sure that mysql has enabled the remote connection permission for the _user_ or _root_ and FirewallD port 3306 
+> (if not enabled, it will not affect data reading and writing).
