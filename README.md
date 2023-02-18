@@ -20,10 +20,10 @@
 ![docker_compose](https://img.shields.io/badge/docker_compose-2.2-lightgrey)
 
 
-![golang](https://img.shields.io/badge/mysql-8.0-blueviolet)
-![golang](https://img.shields.io/badge/redis-6.0-ff69b4)
-![golang](https://img.shields.io/badge/minio-7.0-9cf)
-![golang](https://img.shields.io/badge/rabbitMQ-3.9-orange)
+![mysql](https://img.shields.io/badge/mysql-8.0-blueviolet)
+![redis](https://img.shields.io/badge/redis-6.0-ff69b4)
+![minio](https://img.shields.io/badge/minio-7.0-9cf)
+![rabbitMQ](https://img.shields.io/badge/rabbitMQ-3.9-orange)
 
 ---
 ```

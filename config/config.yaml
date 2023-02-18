@@ -1,13 +1,13 @@
 ip:
-  host: &host 127.0.0.1
+  host: &host 47.115.220.12
 jwt:
   secret: tiktok_demo
 mysql:
   host: *host
   port: 3306
   database: tiktok_demo
-  username: root
-  password: 123456
+  username: tiktokUser
+  password: tiktok123456
 OneDayOfHours:
   OneMinute: 60
   OneDayOfHours: 86400
@@ -16,11 +16,16 @@ OneDayOfHours:
 minio:
   host: *host
   port: 9000
-  rootUser: tiktokDemo
-  rootPassword: tiktokDemo@123456
+  rootUser: minio
+  rootPassword: 123123123
   videoBuckets: video
   picBuckets: pic
+rabbitMQ:
+  host: *host
+  port: 5672
+  defaultUser: tiktok
+  defaultPass: tiktok
 redis:
   host: *host
   port: 6379
-  # password: 123456
+  password: 123456
