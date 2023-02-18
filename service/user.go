@@ -2,6 +2,7 @@ package service
 
 import (
 	"log"
+	"strconv"
 	"tiktok_demo/repository"
 )
 
@@ -13,6 +14,7 @@ type User struct {
 	IsFollow      bool   `json:"is_follow"`
 	TotalFavorite int64  `json:"total_favorite,omitempty"`
 	FavoriteCount int64  `json:"favorite_count,omitempty"`
+	AvatarUrl     string `json:"avatar_url,omitempty"`
 }
 
 type UserImpl struct {
@@ -92,15 +94,40 @@ func (usi *UserImpl) GetUserById(id int64) (User, error) {
 	} else {
 		log.Println("Query User Success")
 	}
-	// TODO Else 5 items needed to add
+	followingcnt, err := usi.GetFollowingCnt(id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("GetFollowingCnt failed")
+		return User{}, err
+	}
+	followercnt, err := usi.GetFollowerCnt(id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("followercnt failed")
+		return User{}, err
+	}
+	totalfavouritecount, err := usi.TotalFavourite(id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("Get total favourite count failed")
+		return User{}, err
+	}
+	favouritevideocount, err := usi.FavouriteVideoCount(id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("Get favourite video count failed")
+		return User{}, err
+	}
+
 	user = User{
 		Id:            id,
 		Name:          tableUser.Username,
-		FollowCount:   0,
-		FollowerCount: 0,
+		FollowCount:   followingcnt,
+		FollowerCount: followercnt,
 		IsFollow:      false,
-		TotalFavorite: 0,
-		FavoriteCount: 0,
+		TotalFavorite: totalfavouritecount,
+		FavoriteCount: favouritevideocount,
+		AvatarUrl:     AvatarById(id),
 	}
 	return user, nil
 }
@@ -123,15 +150,50 @@ func (usi *UserImpl) GetUserByIdWithCurId(id int64, curId int64) (User, error) {
 	} else {
 		log.Println("Query User Success")
 	}
-	// TODO Else 5 items needed to add
+	followingcnt, err := usi.GetFollowingCnt(id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("GetFollowingCnt failed")
+		return User{}, err
+	}
+	followercnt, err := usi.GetFollowerCnt(id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("followercnt failed")
+		return User{}, err
+	}
+	isfollowing, err := usi.IsFollowing(curId, id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("GetIsFollowing failed")
+		return User{}, err
+	}
+	totalfavouritecount, err := usi.TotalFavourite(id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("Get total favourite count failed")
+		return User{}, err
+	}
+	favouritevideocount, err := usi.FavouriteVideoCount(id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("Get favourite video count failed")
+		return User{}, err
+	}
+
 	user = User{
 		Id:            id,
 		Name:          tableUser.Username,
-		FollowCount:   0,
-		FollowerCount: 0,
-		IsFollow:      false,
-		TotalFavorite: 0,
-		FavoriteCount: 0,
+		FollowCount:   followingcnt,
+		FollowerCount: followercnt,
+		IsFollow:      isfollowing,
+		TotalFavorite: totalfavouritecount,
+		FavoriteCount: favouritevideocount,
+		AvatarUrl:     AvatarById(id),
 	}
 	return user, nil
+}
+
+func AvatarById(id int64) string {
+	return "https://api.multiavatar.com/" + strconv.FormatInt(id, 10) + ".png?apikey=uRiGCxXZwPK9h4"
 }
