@@ -12,9 +12,18 @@
 [![MIT License][license-shield]][license-url]
 
 ![golang](https://img.shields.io/badge/golang-1.19-blue)
-![golang](https://img.shields.io/badge/gorm-1.8.2-red)
-![golang](https://img.shields.io/badge/gorm-1.24.5-green)
-![golang](https://img.shields.io/badge/viper-1.15.0-orange")
+![gin](https://img.shields.io/badge/gin-1.8-red)
+![gorm](https://img.shields.io/badge/gorm-1.24-green)
+![viper](https://img.shields.io/badge/viper-1.15-orange)
+![jwt](https://img.shields.io/badge/jwt-4.0-yellowgreen)
+![ffmpeg](https://img.shields.io/badge/ffmpeg-0.4-brightgreen)
+![docker_compose](https://img.shields.io/badge/docker_compose-2.2-lightgrey)
+
+
+![golang](https://img.shields.io/badge/mysql-8.0-blueviolet)
+![golang](https://img.shields.io/badge/redis-6.0-ff69b4)
+![golang](https://img.shields.io/badge/minio-7.0-9cf)
+![golang](https://img.shields.io/badge/rabbitMQ-3.9-orange)
 
 ---
 ```
@@ -84,7 +93,7 @@
 ---
 > In order to make data portable and reusable, we use **volumes** to mount docker data.
 > 
-> Before that, please open each **port** of the corresponding service.
+> Before that, please open each **port** of the corresponding service in firewalld and securityGroup.
 
 - Step 1. Fork this repository
   ``` shell
@@ -99,7 +108,7 @@
   - Start docker service: `systemctl start docker`
   - Download `docker-compose`
     ```shell
-    `docker compose`: `curl -L "https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    curl -L "https://github.com/docker/compose/releases/download/v2.2.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     ```
   - Read and write permission: `chmod -R 777 /usr/local/bin/docker-compose`
 - Step 4. File permission 
@@ -130,11 +139,14 @@
   ```
 **Tips:**
 
-- Stop and delete the container
+- Delete all the containers
 ```shell
-docker stop $(docker ps -q) & docker rm $(docker ps -aq)
+ docker rm $(docker ps -a -q)
 ```
 - Remove `none` image
 ```shell
 docker image prune
 ```
+- For mysql connection
+  > If you are deploying on a remote **ECS** instead of a **virtual machine** and want to connect through tools such as _Navicat_,
+  > please make sure that mysql has enabled the remote connection permission for the _user_ or _root_(if not enabled, it will not affect data reading and writing).

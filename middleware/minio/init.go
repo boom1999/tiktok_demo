@@ -34,7 +34,7 @@ func InitMinio() {
 		}
 	}
 	if !existBulck(MinioPictureBucketName) {
-		if err = CreateBucket(MinioVideoBucketName); err != nil {
+		if err = CreateBucket(MinioPictureBucketName); err != nil {
 			panic("minio client init CreateBucket failed:" + err.Error())
 		}
 	}
