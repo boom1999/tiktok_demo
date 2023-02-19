@@ -7,14 +7,17 @@ import (
 )
 
 type User struct {
-	Id            int64  `json:"id,omitempty"`
-	Name          string `json:"name,omitempty"`
-	FollowCount   int64  `json:"follow_count"`
-	FollowerCount int64  `json:"follower_count"`
-	IsFollow      bool   `json:"is_follow"`
-	TotalFavorite int64  `json:"total_favorite,omitempty"`
-	FavoriteCount int64  `json:"favorite_count,omitempty"`
-	AvatarUrl     string `json:"avatar_url,omitempty"`
+	Id              int64  `json:"id"`
+	Name            string `json:"name"`
+	FollowCount     int64  `json:"follow_count,omitempty"`
+	FollowerCount   int64  `json:"follower_count,omitempty"`
+	IsFollow        bool   `json:"is_follow"`
+	TotalFavorite   int64  `json:"total_favorited,omitempty"`
+	FavoriteCount   int64  `json:"favorite_count,omitempty"`
+	AvatarUrl       string `json:"avatar,omitempty"`
+	BackgroundImage string `json:"background_image,omitempty"`
+	WorkCount       int64  `json:"work_count,omitempty"`
+	Signature       string `json:"signature,omitempty"`
 }
 
 type UserImpl struct {
@@ -120,14 +123,15 @@ func (usi *UserImpl) GetUserById(id int64) (User, error) {
 	}
 
 	user = User{
-		Id:            id,
-		Name:          tableUser.Username,
-		FollowCount:   followingcnt,
-		FollowerCount: followercnt,
-		IsFollow:      false,
-		TotalFavorite: totalfavouritecount,
-		FavoriteCount: favouritevideocount,
-		AvatarUrl:     AvatarById(id),
+		Id:              id,
+		Name:            tableUser.Username,
+		FollowCount:     followingcnt,
+		FollowerCount:   followercnt,
+		IsFollow:        false,
+		TotalFavorite:   totalfavouritecount,
+		FavoriteCount:   favouritevideocount,
+		AvatarUrl:       AvatarById(id),
+		BackgroundImage: AvatarById(id),
 	}
 	return user, nil
 }
@@ -182,14 +186,15 @@ func (usi *UserImpl) GetUserByIdWithCurId(id int64, curId int64) (User, error) {
 	}
 
 	user = User{
-		Id:            id,
-		Name:          tableUser.Username,
-		FollowCount:   followingcnt,
-		FollowerCount: followercnt,
-		IsFollow:      isfollowing,
-		TotalFavorite: totalfavouritecount,
-		FavoriteCount: favouritevideocount,
-		AvatarUrl:     AvatarById(id),
+		Id:              id,
+		Name:            tableUser.Username,
+		FollowCount:     followingcnt,
+		FollowerCount:   followercnt,
+		IsFollow:        isfollowing,
+		TotalFavorite:   totalfavouritecount,
+		FavoriteCount:   favouritevideocount,
+		AvatarUrl:       AvatarById(id),
+		BackgroundImage: AvatarById(id),
 	}
 	return user, nil
 }
