@@ -1,13 +1,13 @@
 package service
 
 import (
-	"log"
 	"strconv"
 	"strings"
 	"sync"
 	"tiktok_demo/middleware/rabbitmq"
 	"tiktok_demo/middleware/redis"
 	"tiktok_demo/repository"
+	"tiktok_demo/util"
 	"time"
 )
 
@@ -165,7 +165,7 @@ func (*FollowImpl) AddFollowRelation(userId int64, targetId int64) (bool, error)
 	sb.WriteString(strconv.Itoa(int(targetId)))
 	rabbitmq.RmqFollowAdd.Publish(sb.String())
 	// 记录日志
-	log.Println("消息打入成功。")
+	util.Log.Debug("消息打入成功。")
 	// 更新redis信息。
 	return updateRedisWithAdd(userId, targetId)
 }
@@ -207,7 +207,7 @@ func (*FollowImpl) DeleteFollowRelation(userId int64, targetId int64) (bool, err
 	sb.WriteString(strconv.Itoa(int(targetId)))
 	rabbitmq.RmqFollowDel.Publish(sb.String())
 	// 记录日志
-	log.Println("消息打入成功。")
+	util.Log.Debug("消息打入成功。")
 	// 更新redis信息。
 	return updateRedisWithDel(userId, targetId)
 }

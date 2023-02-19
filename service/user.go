@@ -1,8 +1,8 @@
 package service
 
 import (
-	"log"
 	"tiktok_demo/repository"
+	"tiktok_demo/util"
 )
 
 type User struct {
@@ -37,7 +37,7 @@ type UserService interface {
 func (usi *UserImpl) GetTableUserList() []repository.TableUser {
 	tableUsers, err := repository.GetTableUserList()
 	if err != nil {
-		log.Println("Err:", err.Error())
+		util.Log.Error("Err:" + err.Error())
 		return tableUsers
 	}
 	return tableUsers
@@ -46,29 +46,29 @@ func (usi *UserImpl) GetTableUserList() []repository.TableUser {
 func (usi *UserImpl) GetTableUserByUserName(userName string) repository.TableUser {
 	tableUser, err := repository.GetTableUserByUserName(userName)
 	if err != nil {
-		log.Println("Err:", err.Error())
-		log.Println("User Not Found")
+		util.Log.Error("Err:" + err.Error())
+		util.Log.Error("User Not Found")
 		return tableUser
 	}
-	log.Println("Query User Success")
+	util.Log.Debug("Query User Success")
 	return tableUser
 }
 
 func (usi *UserImpl) GetTableUserByUserId(userId int64) repository.TableUser {
 	tableUser, err := repository.GetTableUserByUserId(userId)
 	if err != nil {
-		log.Println("Err:", err.Error())
-		log.Println("User Not Found")
+		util.Log.Error("Err:" + err.Error())
+		util.Log.Error("User Not Found")
 		return tableUser
 	}
-	log.Println("Query User Success")
+	util.Log.Debug("Query User Success")
 	return tableUser
 }
 
 func (usi *UserImpl) InsertTableUser(newUser *repository.TableUser) bool {
 	flag := repository.InsertTableUser(newUser)
 	if flag == false {
-		log.Println("failed insert")
+		util.Log.Error("failed insert")
 		return false
 	}
 	return true
@@ -86,11 +86,11 @@ func (usi *UserImpl) GetUserById(id int64) (User, error) {
 	}
 	tableUser, err := repository.GetTableUserByUserId(id)
 	if err != nil {
-		log.Println("Err:", err.Error())
-		log.Println("User Not Found")
+		util.Log.Error("Err:" + err.Error())
+		util.Log.Error("User Not Found")
 		return user, err
 	} else {
-		log.Println("Query User Success")
+		util.Log.Debug("Query User Success")
 	}
 	// TODO Else 5 items needed to add
 	user = User{
@@ -117,11 +117,11 @@ func (usi *UserImpl) GetUserByIdWithCurId(id int64, curId int64) (User, error) {
 	}
 	tableUser, err := repository.GetTableUserByUserId(id)
 	if err != nil {
-		log.Println("Err:", err.Error())
-		log.Println("User Not Found")
+		util.Log.Error("Err:" + err.Error())
+		util.Log.Error("User Not Found")
 		return user, err
 	} else {
-		log.Println("Query User Success")
+		util.Log.Debug("Query User Success")
 	}
 	// TODO Else 5 items needed to add
 	user = User{

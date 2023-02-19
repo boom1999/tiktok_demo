@@ -1,8 +1,6 @@
 package repository
 
-import (
-	"log"
-)
+import "tiktok_demo/util"
 
 // TableUser <---> User struct in mysql
 type TableUser struct {
@@ -21,7 +19,7 @@ func GetTableUserList() ([]TableUser, error) {
 	var tableUsers []TableUser
 	err := DB.Find(&tableUsers).Error
 	if err != nil {
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return tableUsers, err
 	}
 	return tableUsers, nil
@@ -32,7 +30,7 @@ func GetTableUserByUserName(userName string) (TableUser, error) {
 	tableUser := TableUser{}
 	err := DB.Where("username = ?", userName).First(&tableUser).Error
 	if err != nil {
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return tableUser, err
 	}
 	return tableUser, nil
@@ -43,7 +41,7 @@ func GetTableUserByUserId(userId int64) (TableUser, error) {
 	tableUser := TableUser{}
 	err := DB.Where("id = ?", userId).First(&tableUser).Error
 	if err != nil {
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return tableUser, err
 	}
 	return tableUser, nil
@@ -53,7 +51,7 @@ func GetTableUserByUserId(userId int64) (TableUser, error) {
 func InsertTableUser(newUser *TableUser) bool {
 	err := DB.Create(&newUser).Error
 	if err != nil {
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return false
 	}
 	return true
