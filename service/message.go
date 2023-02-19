@@ -20,7 +20,7 @@ type Message struct {
 	From_user_id int64  `json:"from_user_id"`
 	To_user_id   int64  `json:"to_user_id"`
 	Content      string `json:"content"`
-	Create_time  string `json:"create_time"`
+	Create_time  string `json:"create_time,omitempty"`
 }
 
 func (m MessageServiceImpl) Send(message Message) error {

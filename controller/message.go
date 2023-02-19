@@ -14,7 +14,7 @@ import (
 // 消息记录返回参数
 type MessageChatResponse struct {
 	StatusCode  int32             `json:"status_code"`
-	StatusMsg   string            `json:"status_msg"`
+	StatusMsg   string            `json:"status_msg,omitempty"`
 	MessageList []service.Message `json:"message_list"`
 }
 
