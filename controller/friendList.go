@@ -9,7 +9,7 @@ import (
 
 type FriendListResponse struct {
 	Response
-	FriendList []service.User `json:"user_list,omitempty"`
+	FriendList []service.FriendUser `json:"user_list,omitempty"`
 }
 
 // GetFriendList route: /douyin/relation/friend/list/
