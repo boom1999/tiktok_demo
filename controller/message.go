@@ -2,11 +2,11 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strconv"
 	"tiktok_demo/config"
 	"tiktok_demo/service"
+	"tiktok_demo/util"
 	"time"
 )
 
@@ -37,7 +37,7 @@ func MessageAction(c *gin.Context) {
 			StatusCode: -1,
 			StatusMsg:  "message fromUserId json invalid",
 		})
-		log.Println("messageController-MessageAction: fromUserId json invalid")
+		util.Log.Error("messageController-MessageAction: fromUserId json invalid" + err.Error())
 		return
 	}
 	// 获取 to_user_id
@@ -47,7 +47,7 @@ func MessageAction(c *gin.Context) {
 			StatusCode: -1,
 			StatusMsg:  "message toUserId json invalid",
 		})
-		log.Println("messageController-MessageAction: toUserId json invalid")
+		util.Log.Error("messageController-MessageAction: toUserId json invalid" + err.Error())
 		return
 	}
 	// 获取 actionType
@@ -57,7 +57,7 @@ func MessageAction(c *gin.Context) {
 			StatusCode: -1,
 			StatusMsg:  "message actionType json invalid",
 		})
-		log.Println("messageController-MessageAction: actionType json invalid")
+		util.Log.Error("messageController-MessageAction: actionType json invalid" + err.Error())
 		return
 	}
 	// 获取 content
@@ -67,7 +67,7 @@ func MessageAction(c *gin.Context) {
 			StatusCode: -1,
 			StatusMsg:  "message content json invalid",
 		})
-		log.Println("messageController-MessageAction: content json invalid")
+		util.Log.Error("messageController-MessageAction: content json invalid" + err.Error())
 		return
 	}
 	//调用service层发送消息函数
@@ -87,7 +87,7 @@ func MessageAction(c *gin.Context) {
 				StatusCode: -1,
 				StatusMsg:  "send message false",
 			})
-			log.Printf("messageController-MessageAction: %v", err)
+			util.Log.Error("messageController-MessageAction:" + err.Error())
 			return
 		}
 		// 发送消息成功
@@ -95,7 +95,7 @@ func MessageAction(c *gin.Context) {
 			StatusCode: 0,
 			StatusMsg:  "send message successful",
 		})
-		log.Println("send message successful")
+		util.Log.Debug("send message successful")
 		return
 
 	} else {
@@ -103,7 +103,7 @@ func MessageAction(c *gin.Context) {
 			StatusCode: -1,
 			StatusMsg:  "message actionType json invalid",
 		})
-		log.Println("messageController-MessageAction: actionType json invalid")
+		util.Log.Debug("messageController-MessageAction: actionType json invalid")
 		return
 	}
 }
@@ -121,7 +121,7 @@ func MessageChat(c *gin.Context) {
 			StatusMsg:   "message userId json invalid",
 			MessageList: make([]service.Message, 0),
 		})
-		log.Println("messageController-MessageChat: userId json invalid")
+		util.Log.Error("messageController-MessageChat: userId json invalid" + err.Error())
 		return
 	}
 	// 获取 to_user_id
@@ -132,7 +132,7 @@ func MessageChat(c *gin.Context) {
 			StatusMsg:   "message to_user_id json invalid",
 			MessageList: make([]service.Message, 0),
 		})
-		log.Println("messageController-MessageChat: to_user_id json invalid")
+		util.Log.Error("messageController-MessageChat: to_user_id json invalid" + err.Error())
 		return
 	}
 	// 调用 service 层消息记录函数
@@ -144,7 +144,7 @@ func MessageChat(c *gin.Context) {
 			StatusMsg:   "message GetList false",
 			MessageList: make([]service.Message, 0),
 		})
-		log.Println("messageController-MessageChat: message GetList false")
+		util.Log.Error("messageController-MessageChat: message GetList false" + err.Error())
 		return
 	}
 	// 获取聊天记录成功
@@ -153,6 +153,6 @@ func MessageChat(c *gin.Context) {
 		StatusMsg:   "get messageList success",
 		MessageList: message_list,
 	})
-	log.Println("messageController-MessageChat: return success") //成功返回列表
+	util.Log.Debug("messageController-MessageChat: return success") //成功返回列表
 	return
 }

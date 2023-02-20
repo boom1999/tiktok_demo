@@ -1,8 +1,8 @@
 package service
 
 import (
-	"log"
 	"tiktok_demo/repository"
+	"tiktok_demo/util"
 )
 
 type MessageServiceImpl struct {
@@ -43,7 +43,7 @@ func (m MessageServiceImpl) GetList(userId int64, toUserId int64) ([]Message, er
 	// 根据 userId toUserId 去数据库中查询消息
 	tableMessageListFrom, tableMessageListTo, err := repository.GetMessageList(userId, toUserId)
 	if err != nil {
-		log.Println("MessageService-GetList: return err: " + err.Error())
+		util.Log.Error("MessageService-GetList: return err: " + err.Error())
 		return make([]Message, 0), err
 	}
 	// 返回的 messageList

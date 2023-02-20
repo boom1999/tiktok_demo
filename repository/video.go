@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"go.uber.org/zap"
 	"io"
-	"log"
 	"net/url"
 	"tiktok_demo/config"
 	"tiktok_demo/middleware/minio"
+	"tiktok_demo/util"
 	"time"
 )
 
@@ -70,11 +71,11 @@ func FileMinio(bucketName string, objectName string, file io.Reader, contentType
 	err := minio.UploadFile(bucketName, objectName, file, contentType, objectSize)
 	//_, err := minio.UploadLocalFile(bucketName, objectName, filePath, contentType)
 	if err != nil {
-		log.Printf("上传%v类型%v至minio失败！！！", contentType, objectName)
+		util.Log.Error("上传文件至 minio 失败"+err.Error(), zap.String("contentType", contentType), zap.String("objectName", objectName))
 	} else {
-		log.Printf("上传%v类型%v至minio成功！！！", contentType, objectName)
+		util.Log.Debug("上传文件至 minio 成功!!!", zap.String("contentType", contentType), zap.String("objectName", objectName))
 	}
-	log.Println("上传成功！！！！！")
+	util.Log.Debug("upload success!!!")
 	return nil
 }
 
@@ -84,7 +85,7 @@ func GetfileURL(bucketName string, fileName string) (*url.URL, error) {
 	var expires time.Duration = 0
 	fileURL, err := minio.GetFileUrl(bucketName, fileName, expires)
 	if err != nil {
-		log.Println("GetURL false!!!")
+		util.Log.Error("GetURL false!!!" + err.Error())
 	}
 	return fileURL, err
 }

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/u2takey/ffmpeg-go"
+	"go.uber.org/zap"
 	"io"
-	"log"
 	"mime/multipart"
 	"os"
 	"strconv"
@@ -33,17 +33,17 @@ func (videoService VideoServiceImpl) Feed(lastTime time.Time, userId int64) ([]V
 	//根据传入的时间，获得传入时间前n个视频，可以通过config.videoCount来控制
 	tableVideos, err := repository.GetVideosByLastTime(lastTime)
 	if err != nil {
-		log.Printf("方法dao.GetVideosByLastTime(lastTime) 失败：%v", err)
+		util.Log.Error("call repository.GetVideosByLastTime(lastTime) failed" + err.Error())
 		return nil, time.Time{}, err
 	}
-	log.Printf("方法dao.GetVideosByLastTime(lastTime) 成功：%v", tableVideos)
+	util.Log.Debug("call repository.GetVideosByLastTime(lastTime) success")
 	//将数据通过copyVideos进行处理，在拷贝的过程中对数据进行组装
 	err = videoService.copyVideos(&videos, &tableVideos, userId)
 	if err != nil {
-		log.Printf("方法videoService.copyVideos(&videos, &tableVideos, userId) 失败：%v", err)
+		util.Log.Error("call videoService.copyVideos(&videos, &tableVideos, userId) failed" + err.Error())
 		return nil, time.Time{}, err
 	}
-	log.Printf("方法videoService.copyVideos(&videos, &tableVideos, userId) 成功")
+	util.Log.Debug("call videoService.copyVideos(&videos, &tableVideos, userId) success")
 	//返回数据，同时获得视频中最早的时间返回
 	var t time.Time
 	return videos, t, nil
@@ -58,10 +58,10 @@ func (videoService *VideoServiceImpl) GetVideo(videoId int64, userId int64) (Vid
 	//从数据库中查询数据，如果查询不到数据，就直接失败返回，后续流程就不需要执行了
 	data, err := repository.GetVideoByVideoId(videoId)
 	if err != nil {
-		log.Printf("方法dao.GetVideoByVideoId(videoId) 失败：%v", err)
+		util.Log.Error("call repository.GetVideoByVideoId(videoId) failed" + err.Error())
 		return video, err
 	} else {
-		log.Printf("方法dao.GetVideoByVideoId(videoId) 成功")
+		util.Log.Debug("call repository.GetVideoByVideoId(videoId) success")
 	}
 
 	//插入从数据库中查到的数据
@@ -76,12 +76,12 @@ func (videoService *VideoServiceImpl) Publish(data *multipart.FileHeader, userId
 
 	video, err := data.Open()
 	if err != nil {
-		log.Printf("方法data.Open() 失败%v", err)
+		util.Log.Error("call data.Open() failed" + err.Error())
 		return err
 	}
 	defer video.Close()
 
-	log.Printf("方法data.Open() 成功")
+	util.Log.Debug("call data.Open() success")
 	//生成一个uuid作为视频的名字
 	//videoName := uuid.NewV4().String()
 	var videoName, pictureName strings.Builder
@@ -93,7 +93,7 @@ func (videoService *VideoServiceImpl) Publish(data *multipart.FileHeader, userId
 	pictureName.WriteString("_")
 	pictureName.WriteString(strconv.FormatInt(util.GetCurrentTimeMillisecond(), 10))
 	pictureName.WriteString(".jpg")
-	log.Printf("生成视频名称%v,生成图片名称%v", videoName.String(), pictureName.String())
+	util.Log.Debug("debug", zap.String("生成的视频名称", videoName.String()), zap.String("生成的图片名称", pictureName.String()))
 	videoBucketName := config.Config.Minio.VideoBuckets
 	pictureBucketName := config.Config.Minio.PicBuckets
 	/*videoPath := config.VideoPath + videoName.String()
@@ -103,14 +103,14 @@ func (videoService *VideoServiceImpl) Publish(data *multipart.FileHeader, userId
 	}*/
 	err = repository.FileMinio(videoBucketName, videoName.String(), video, "mp4", data.Size)
 	if err != nil {
-		log.Printf("方法repository.VideoMinio(video, videoName.String(), videoSize)%v", err)
+		util.Log.Error("call repository.VideoMinio(video, videoName.String(), videoSize) failed" + err.Error())
 		return err
 	}
-	log.Printf("repository.VideoMinio(video, videoName.String(), videoSize)成功")
+	util.Log.Debug("call repository.VideoMinio(video, videoName.String(), videoSize) success")
 
 	videoURL, err := repository.GetfileURL(videoBucketName, videoName.String())
 	if err != nil {
-		log.Printf("方法repository.GetfileURL(videoBucketName, videoName.String()) 失败%v", err)
+		util.Log.Error("call repository.GetfileURL(videoBucketName, videoName.String()) failed" + err.Error())
 	}
 	videoplayURL := videoURL
 	videoplayURL.RawQuery = ""
@@ -118,16 +118,16 @@ func (videoService *VideoServiceImpl) Publish(data *multipart.FileHeader, userId
 
 	buf, bufsize, err := Getimagestream(videoplayURL.String())
 	if err != nil {
-		log.Printf("获取视频第一帧数据流失败%v", err)
+		util.Log.Error("获取视频第一帧数据流失败" + err.Error())
 		return err
 	}
-	log.Printf("获取视频第一帧数据流成功%v", pictureName.String())
+	util.Log.Debug("debug", zap.String("获取视频第一帧数据流成功", pictureName.String()))
 
 	// TODO 在服务器上执行ffmpeg 从视频流中获取第一帧截图，并将图片上传到minio上
 
 	err = repository.FileMinio(pictureBucketName, pictureName.String(), buf, "jpg", bufsize)
 	if err != nil {
-		log.Printf("方法repository.VideoMinio(image, pictureName.String(), pictureBucketName, videoSize) 失败%v", err)
+		util.Log.Error("call repository.VideoMinio(image, pictureName.String(), pictureBucketName, videoSize) failed" + err.Error())
 		return err
 	}
 
@@ -140,20 +140,20 @@ func (videoService *VideoServiceImpl) Publish(data *multipart.FileHeader, userId
 
 	pictureURL, err := repository.GetfileURL(pictureBucketName, pictureName.String())
 	if err != nil {
-		log.Printf("方法repository.GetfileURL(pictureBucketName, pictureName.String()) 失败%v", err)
+		util.Log.Error("call repository.GetfileURL(pictureBucketName, pictureName.String()) failed" + err.Error())
 	}
 
 	pictureplayURL := pictureURL
 	pictureplayURL.RawQuery = ""
 	err = repository.Save(videoURL.String(), pictureplayURL.String(), userId, title)
 
-	log.Printf("videplayURL:%v, pictureplayURL:%v", videoplayURL.String(), pictureplayURL.String())
+	util.Log.Debug("debug", zap.String("videplayURL", videoplayURL.String()), zap.String("pictureplayURL", pictureplayURL.String()))
 
 	if err != nil {
-		log.Printf("方法repository.Save(videoURL.String(), pictureURL.String(), userId, title) 失败%v", err)
+		util.Log.Error("call repository.Save(videoURL.String(), pictureURL.String(), userId, title) failed" + err.Error())
 		return err
 	}
-	log.Printf("方法repository.Save(videoURL.String(), pictureURL.String(), userId, title) 成功")
+	util.Log.Debug("call repository.Save(videoURL.String(), pictureURL.String(), userId, title) success")
 	return nil
 }
 
@@ -163,16 +163,16 @@ func (videoService *VideoServiceImpl) List(userId int64, curId int64) ([]Video, 
 	//依据用户id查询所有的视频，获取视频列表
 	data, err := repository.GetVideosByAuthorId(userId)
 	if err != nil {
-		log.Printf("方法dao.GetVideosByAuthorId(%v)失败:%v", userId, err)
+		util.Log.Error("call repository.GetVideosByAuthorId(userId) failed" + err.Error())
 		return nil, err
 	}
-	log.Printf("方法dao.GetVideosByAuthorId(%v)成功:%v", userId, data)
+	util.Log.Debug("call repository.GetVideosByAuthorId(userId) success")
 	//提前定义好切片长度
 	result := make([]Video, 0, len(data))
 	//调用拷贝方法，将数据进行转换
 	err = videoService.copyVideos(&result, &data, curId)
 	if err != nil {
-		log.Printf("方法videoService.copyVideos(&result, &data, %v)失败:%v", userId, err)
+		util.Log.Error("call videoService.copyVideos(&result, &data, curId) failed" + err.Error())
 		return nil, err
 	}
 	//如果数据没有问题，则直接返回
@@ -205,9 +205,9 @@ func (videoService *VideoServiceImpl) creatVideo(video *Video, data *repository.
 	go func() {
 		video.Author, err = userService.GetUserByIdWithCurId(data.AuthorId, userId)
 		if err != nil {
-			log.Printf("方法userService.GetUserByIdWithCurId(data.AuthorId, userId) 失败：%v", err)
+			util.Log.Error("call userService.GetUserByIdWithCurId(data.AuthorId, userId) failed" + err.Error())
 		} else {
-			log.Printf("方法userService.GetUserByIdWithCurId(data.AuthorId, userId) 成功")
+			util.Log.Debug("call userService.GetUserByIdWithCurId(data.AuthorId, userId)  success")
 		}
 		wg.Done()
 	}()
@@ -216,9 +216,9 @@ func (videoService *VideoServiceImpl) creatVideo(video *Video, data *repository.
 	go func() {
 		video.FavoriteCount, err = likeService.FavouriteCount(data.Id)
 		if err != nil {
-			log.Printf("方法likeService.FavouriteCount(data.ID) 失败：%v", err)
+			util.Log.Error("call likeService.FavouriteCount(data.Id) failed" + err.Error())
 		} else {
-			log.Printf("方法likeService.FavouriteCount(data.ID) 成功")
+			util.Log.Debug("call likeService.FavouriteCount(data.Id) success")
 		}
 		wg.Done()
 	}()
@@ -227,9 +227,9 @@ func (videoService *VideoServiceImpl) creatVideo(video *Video, data *repository.
 	go func() {
 		video.CommentCount, err = commentService.CountFromVideoId(data.Id)
 		if err != nil {
-			log.Printf("方法commentService.CountFromVideoId(data.ID) 失败：%v", err)
+			util.Log.Error("call commentService.CountFromVideoId(data.Id) failed" + err.Error())
 		} else {
-			log.Printf("方法commentService.CountFromVideoId(data.ID) 成功")
+			util.Log.Debug("call commentService.CountFromVideoId(data.Id) success")
 		}
 		wg.Done()
 	}()
@@ -238,9 +238,9 @@ func (videoService *VideoServiceImpl) creatVideo(video *Video, data *repository.
 	go func() {
 		video.IsFavorite, err = likeService.IsFavourite(video.Id, userId)
 		if err != nil {
-			log.Printf("方法likeService.IsFavourit(video.Id, userId) 失败：%v", err)
+			util.Log.Error("call likeService.IsFavourit(video.Id, userId) failed" + err.Error())
 		} else {
-			log.Printf("方法likeService.IsFavourit(video.Id, userId) 成功")
+			util.Log.Debug("call likeService.IsFavourit(video.Id, userId) success")
 		}
 		wg.Done()
 	}()
@@ -254,10 +254,10 @@ func (videoService *VideoServiceImpl) GetVideoIdList(authorId int64) ([]int64, e
 	//直接调用dao层方法获取id即可
 	id, err := repository.GetVideoIdsByAuthorId(authorId)
 	if err != nil {
-		log.Printf("方法dao.GetVideoIdsByAuthorId(%v) 失败：%v", authorId, err)
+		util.Log.Error("call repository.GetVideoIdsByAuthorId(authorId) failed" + err.Error())
 		return nil, err
 	} else {
-		log.Printf("方法dao.GetVideoIdsByAuthorId(%v) 成功", authorId)
+		util.Log.Debug("call repository.GetVideoIdsByAuthorId(authorId) success")
 	}
 	return id, nil
 }
@@ -291,9 +291,9 @@ func Getimagestream(inputFile string) (io.Reader, int64, error) {
 
 	// 结果显示
 	if err != nil {
-		log.Fatalln("截取图片失败", err)
+		util.Log.Error("截取图片失败" + err.Error())
 		return buf, 0, err
 	}
-	log.Printf("截取图片成功")
+	util.Log.Debug("截取图片成功")
 	return buf, int64(buf.Len()), nil
 }

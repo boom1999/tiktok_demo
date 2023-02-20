@@ -2,10 +2,11 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
+	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 	"tiktok_demo/service"
+	"tiktok_demo/util"
 	"time"
 )
 
@@ -23,7 +24,7 @@ type VideoListResponse struct {
 // Feed /feed/
 func Feed(c *gin.Context) {
 	inputTime := c.Query("latest_time")
-	log.Printf("传入的时间" + inputTime)
+	util.Log.Debug("debug", zap.String("acquired latest_time", inputTime))
 	var lastTime time.Time
 	if inputTime != "0" {
 		me, _ := strconv.ParseInt(inputTime, 10, 64)
@@ -31,19 +32,19 @@ func Feed(c *gin.Context) {
 	} else {
 		lastTime = time.Now()
 	}
-	log.Printf("获取到时间戳%v", lastTime)
+	util.Log.Debug("debug", zap.Time("acquired timestamp", lastTime))
 	userId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
-	log.Printf("获取到用户id:%v\n", userId)
+	util.Log.Debug("debug", zap.Int64("acquired userId", userId))
 	videoService := GetVideo()
 	feed, nextTime, err := videoService.Feed(lastTime, userId)
 	if err != nil {
-		log.Printf("方法videoService.Feed(lastTime, userId) 失败：%v", err)
+		util.Log.Error("call videoService.Feed(lastTime, userId) failed" + err.Error())
 		c.JSON(http.StatusOK, FeedResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "获取视频流失败"},
 		})
 		return
 	}
-	log.Printf("方法videoService.Feed(lastTime, userId) 成功")
+	util.Log.Debug("call videoService.Feed(lastTime, userId) success")
 	c.JSON(http.StatusOK, FeedResponse{
 		Response:  Response{StatusCode: 0},
 		VideoList: feed,
@@ -55,7 +56,7 @@ func Feed(c *gin.Context) {
 func Publish(c *gin.Context) {
 	data, err := c.FormFile("data")
 	if err != nil {
-		log.Printf("获取视频流失败:%v", err)
+		util.Log.Error("acquired video streaming failed" + err.Error())
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
 			StatusMsg:  err.Error(),
@@ -64,21 +65,21 @@ func Publish(c *gin.Context) {
 	}
 
 	userId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
-	log.Printf("获取到用户id:%v\n", userId)
+	util.Log.Debug("debug", zap.Int64("acquired userId", userId))
 	title := c.PostForm("title")
-	log.Printf("获取到视频title:%v\n", title)
+	util.Log.Debug("debug", zap.String("acquired video title", title))
 
 	videoService := GetVideo()
 	err = videoService.Publish(data, userId, title, c)
 	if err != nil {
-		log.Printf("方法videoService.Publish(data, userId, title) 失败：%v", err)
+		util.Log.Error("call videoService.Publish(data, userId, title) failed" + err.Error())
 		c.JSON(http.StatusOK, Response{
 			StatusCode: 1,
 			StatusMsg:  err.Error(),
 		})
 		return
 	}
-	log.Printf("方法videoService.Publish(data, userId) 成功")
+	util.Log.Debug("call videoService.Publish(data, userId) success")
 
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
@@ -90,19 +91,19 @@ func Publish(c *gin.Context) {
 func PublishList(c *gin.Context) {
 	user_Id, _ := c.GetQuery("user_id")
 	userId, _ := strconv.ParseInt(user_Id, 10, 64)
-	log.Printf("获取到用户id:%v\n", userId)
+	util.Log.Debug("debug", zap.Int64("acquired userId", userId))
 	curId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
-	log.Printf("获取到当前用户id:%v\n", curId)
+	util.Log.Debug("debug", zap.Int64("acquired current userId", curId))
 	videoService := GetVideo()
 	list, err := videoService.List(userId, curId)
 	if err != nil {
-		log.Printf("调用videoService.List(%v)出现错误：%v\n", userId, err)
+		util.Log.Error("call videoService.List(userId, curId) failed" + err.Error())
 		c.JSON(http.StatusOK, VideoListResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "获取视频列表失败"},
 		})
 		return
 	}
-	log.Printf("调用videoService.List(%v)成功", userId)
+	util.Log.Debug("call videoService.List(userId, curId) success")
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response:  Response{StatusCode: 0},
 		VideoList: list,

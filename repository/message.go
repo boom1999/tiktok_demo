@@ -2,7 +2,7 @@ package repository
 
 import (
 	"errors"
-	"log"
+	"tiktok_demo/util"
 )
 
 // TableMessage 消息-数据库中的结构体
@@ -22,10 +22,11 @@ func (tableMessage TableMessage) TableName() string {
 func InsertTableMessage(tableMessage TableMessage) error {
 	err := DB.Model(TableMessage{}).Create(&tableMessage).Error
 	if err != nil {
-		log.Println("InsertTableMessage: return insert Message failed") //函数返回提示错误信息
+		// 函数返回提示错误信息
+		util.Log.Error("InsertTableMessage: return insert Message failed" + errors.New("insert message failed").Error())
 		return errors.New("insert message failed")
 	}
-	log.Println("InsertTableMessage: return success")
+	util.Log.Debug("InsertTableMessage: return success")
 	return nil
 }
 
@@ -39,9 +40,9 @@ func GetMessageList(userId int64, toUserId int64) ([]TableMessage, []TableMessag
 	resultTo := DB.Model(TableMessage{}).Where(map[string]interface{}{"From_user_id": toUserId, "to_user_id": userId}).
 		Order("Create_time desc").Find(&tableMessageListTo)
 	if resultFrom.Error != nil && resultTo.Error != nil {
-		log.Println("GetMessageList false")
+		util.Log.Error("GetMessageList false" + errors.New("get comment list failed").Error())
 		return tableMessageListFrom, tableMessageListTo, errors.New("get comment list failed")
 	}
-	log.Println("GetMessageList successful")
+	util.Log.Debug("GetMessageList successful")
 	return tableMessageListFrom, tableMessageListTo, nil
 }
