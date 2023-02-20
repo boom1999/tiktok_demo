@@ -7,7 +7,7 @@ import (
 )
 
 type Video struct {
-	repository.TableVideo
+	repository.PartVideo
 	Author        User  `json:"author"`
 	FavoriteCount int64 `json:"favorite_count"`
 	CommentCount  int64 `json:"comment_count"`

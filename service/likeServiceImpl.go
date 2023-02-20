@@ -14,8 +14,10 @@ import (
 )
 
 type LikeServiceImpl struct {
-	VideoService
+	VideoServiceImpl
+	UserImpl
 	UserService
+	VideoService
 }
 
 /*
