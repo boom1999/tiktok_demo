@@ -133,6 +133,12 @@
       cd tiktokCache/redis
       chmod -R 777 logs/
       ```
+  - For `zap-log`
+    - Remember to add log volumes in `docker-compose.yml`
+      ``` shell
+      cd ./logFile
+      chmod tiktok_demo.log
+      ```
 - Step 5.RUN: 
   ```shell
   docker-compose up

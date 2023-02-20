@@ -63,6 +63,7 @@ services:
     volumes:
       - ./wait-for-it.sh:/root/wait-for-it.sh
       - ./config/config.yaml:/root/config/config.yaml
+      - ./logFile/tiktok_demo.log:/root/logFile/tiktok_demo.log
     ports:
       - "8080:8080"
     depends_on:
