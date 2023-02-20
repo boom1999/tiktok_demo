@@ -28,16 +28,17 @@ func FavoriteAction(c *gin.Context) {
 
 	likeService := new(service.LikeServiceImpl)
 	err := likeService.FavouriteAction(userId, videoId, int32(actionType))
+	// 官方文档有矛盾 1-成功 0-失败
 	if err == nil {
 		util.Log.Debug("favourite action success")
 		c.JSON(http.StatusOK, likeResponse{
-			StatusCode: 0,
+			StatusCode: 1,
 			StatusMsg:  "favourite action success",
 		})
 	} else {
 		util.Log.Error("favourite action fail" + err.Error())
 		c.JSON(http.StatusOK, likeResponse{
-			StatusCode: 1,
+			StatusCode: 0,
 			StatusMsg:  "favourite action fail",
 		})
 	}
@@ -47,7 +48,7 @@ func FavoriteAction(c *gin.Context) {
 func GetFavouriteList(c *gin.Context) {
 	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
 	curId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
-	
+
 	likeService := new(service.LikeServiceImpl)
 	videos, err := likeService.GetFavouriteList(userId, curId)
 	if err == nil {

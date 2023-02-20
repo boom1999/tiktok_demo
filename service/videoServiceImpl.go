@@ -45,8 +45,7 @@ func (videoService VideoServiceImpl) Feed(lastTime time.Time, userId int64) ([]V
 	}
 	util.Log.Debug("call videoService.copyVideos(&videos, &tableVideos, userId) success")
 	//返回数据，同时获得视频中最早的时间返回
-	var t time.Time
-	return videos, t, nil
+	return videos, tableVideos[0].PublishTime, nil
 }
 
 // GetVideo
@@ -196,7 +195,12 @@ func (videoService *VideoServiceImpl) creatVideo(video *Video, data *repository.
 	var wg sync.WaitGroup
 	wg.Add(4)
 	var err error
-	video.TableVideo = *data
+	// 封装Video里面的PartVideo
+	video.Id = data.Id
+	video.CoverUrl = data.CoverUrl
+	video.PlayUrl = data.PlayUrl
+	video.Title = data.Title
+
 	userService := new(UserImpl)
 	likeService := new(LikeServiceImpl)
 	commentService := new(CommentServiceImpl)

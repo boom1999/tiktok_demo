@@ -19,6 +19,13 @@ type TableVideo struct {
 	Title       string    `gorm:"column:title;not null;type:varchar(255)"`
 }
 
+type PartVideo struct {
+	Id       int64  `json:"id"`
+	PlayUrl  string `json:"play_url"`
+	CoverUrl string `json:"cover_url"`
+	Title    string `json:"title"`
+}
+
 // TableName
 func (TableVideo) TableName() string {
 	return "videos"

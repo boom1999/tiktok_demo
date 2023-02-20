@@ -13,7 +13,7 @@ import (
 type FeedResponse struct {
 	Response
 	VideoList []service.Video `json:"video_list"`
-	NextTime  int64           `json:"next_time"`
+	NextTime  int64           `json:"next_time,omitempty"`
 }
 
 type VideoListResponse struct {
@@ -46,7 +46,7 @@ func Feed(c *gin.Context) {
 	}
 	util.Log.Debug("call videoService.Feed(lastTime, userId) success")
 	c.JSON(http.StatusOK, FeedResponse{
-		Response:  Response{StatusCode: 0},
+		Response:  Response{StatusCode: 0, StatusMsg: "获取视频流成功"},
 		VideoList: feed,
 		NextTime:  nextTime.Unix(),
 	})
@@ -105,7 +105,7 @@ func PublishList(c *gin.Context) {
 	}
 	util.Log.Debug("call videoService.List(userId, curId) success")
 	c.JSON(http.StatusOK, VideoListResponse{
-		Response:  Response{StatusCode: 0},
+		Response:  Response{StatusCode: 0, StatusMsg: "获取视频列表成功"},
 		VideoList: list,
 	})
 }
