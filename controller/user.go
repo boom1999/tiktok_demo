@@ -1,13 +1,15 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strconv"
 	"tiktok_demo/middleware/jwt"
 	"tiktok_demo/repository"
 	"tiktok_demo/service"
+	"tiktok_demo/util"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type Response struct {
@@ -44,12 +46,12 @@ func Register(ctx *gin.Context) {
 			Password: jwt.PswEnCode(password),
 		}
 		if usi.InsertTableUser(&newUser) != true {
-			log.Println("Insert Data Fail")
+			util.Log.Error("Insert Data Fail")
 		} else {
-			log.Println("Insert Data Success")
+			util.Log.Error("Insert Data Success")
 		}
 		token, _ := jwt.GenToken(userName)
-		log.Println("registered Id: ", u.Id)
+		util.Log.Debug("info", zap.Int64("registered Id: ", u.Id))
 		ctx.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0, StatusMsg: "OK"},
 			UserId:   u.Id,
@@ -58,12 +60,12 @@ func Register(ctx *gin.Context) {
 	}
 }
 
-// Login Post route: douyin/user/login/
+// Login Post route: douyin/user/util.Login/
 func Login(ctx *gin.Context) {
 	userName := ctx.Query("username")
 	password := ctx.Query("password")
 	encodedPassword := jwt.PswEnCode(password)
-	log.Println("encodedPassword: ", encodedPassword)
+	util.Log.Debug("info", zap.String("encodedPassword: ", encodedPassword))
 
 	usi := service.UserImpl{}
 	u := usi.GetTableUserByUserName(userName)
@@ -74,7 +76,7 @@ func Login(ctx *gin.Context) {
 	}
 	if encodedPassword == u.Password {
 		token, _ := jwt.GenToken(userName)
-		log.Println("login Id: ", u.Id)
+		util.Log.Debug("info", zap.Int64("util.Login Id: ", u.Id))
 		ctx.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0, StatusMsg: "OK"},
 			UserId:   u.Id,

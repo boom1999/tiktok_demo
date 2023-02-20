@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// CommentService 接口定义
+//  接口定义
 type CommentService interface {
 	// CountFromVideoId
 	CountFromVideoId(id int64) (int64, error)
@@ -17,7 +17,7 @@ type CommentService interface {
 	GetList(videoId int64, userId int64) ([]CommentInfo, error)
 }
 
-// CommentInfo 
+// CommentInfo
 type CommentInfo struct {
 	Id         int64  `json:"id,omitempty"`
 	UserInfo   User   `json:"user,omitempty"`

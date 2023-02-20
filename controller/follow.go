@@ -2,11 +2,12 @@ package controller
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strconv"
 	"tiktok_demo/service"
+	"tiktok_demo/util"
+
+	"github.com/gin-gonic/gin"
 )
 
 type RelationActionResp struct {
@@ -33,7 +34,7 @@ func RelationAction(ctx *gin.Context) {
 	fmt.Println("userId, targetId, actionType: ", userId, targetId, actionType)
 	// 1-follow, 2-deleteFollow
 	if nil != err1 || nil != err2 || nil != err3 || actionType < 1 || actionType > 2 {
-		log.Println("get ctx failed")
+		util.Log.Error("get ctx failed")
 		ctx.JSON(http.StatusOK, RelationActionResp{
 			Response{
 				StatusCode: -1,
@@ -49,9 +50,9 @@ func RelationAction(ctx *gin.Context) {
 		go func() {
 			_, err := fsi.AddFollowRelation(userId, targetId)
 			if err != nil {
-				log.Println("Follow failed")
+				util.Log.Error("Follow failed")
 			} else {
-				log.Println("Follow succeed")
+				util.Log.Error("Follow succeed")
 			}
 		}()
 	// delete follow
@@ -59,10 +60,10 @@ func RelationAction(ctx *gin.Context) {
 		go func() {
 			_, err := fsi.DeleteFollowRelation(userId, targetId)
 			if err != nil {
-				log.Println("Delete follow failed")
+				util.Log.Error("Delete follow failed")
 
 			} else {
-				log.Println("Delete follow succeed")
+				util.Log.Error("Delete follow succeed")
 			}
 		}()
 	}
@@ -101,7 +102,7 @@ func GetFollowingList(ctx *gin.Context) {
 		return
 	}
 	// Get followingList succeed
-	log.Println("Get followingList succeed。")
+	util.Log.Debug("Get followingList succeed。")
 	ctx.JSON(http.StatusOK, FollowingResp{
 		UserList: users,
 		Response: Response{
@@ -138,7 +139,7 @@ func GetFollowersList(ctx *gin.Context) {
 		return
 	}
 	// Get followerList succeed
-	log.Println("Get followerList succeed。")
+	util.Log.Debug("Get followerList succeed。")
 	ctx.JSON(http.StatusOK, FollowingResp{
 		UserList: users,
 		Response: Response{

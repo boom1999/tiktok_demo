@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"log"
 	"sync"
+	"tiktok_demo/util"
 )
 
 type Follow struct {
@@ -45,7 +45,7 @@ func (*FollowCURD) FindRelation(userId int64, targetId int64) (*Follow, error) {
 		if "record not found" == err.Error() {
 			return nil, nil
 		}
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return nil, err
 	}
 
@@ -56,7 +56,7 @@ func (*FollowCURD) FindRelation(userId int64, targetId int64) (*Follow, error) {
 func (*FollowCURD) GetFollowerCnt(userId int64) (int64, error) {
 	var cnt int64
 	if err := DB.Model(Follow{}).Where("user_id = ? and cancel = ?", userId, 0).Count(&cnt).Error; err != nil {
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return 0, err
 	}
 	return cnt, nil
@@ -66,7 +66,7 @@ func (*FollowCURD) GetFollowerCnt(userId int64) (int64, error) {
 func (*FollowCURD) GetFollowingCnt(userId int64) (int64, error) {
 	var cnt int64
 	if err := DB.Model(Follow{}).Where("follower_id = ? and cancel = ?", userId, 0).Count(&cnt).Error; err != nil {
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return 0, err
 	}
 	return cnt, nil
@@ -80,7 +80,7 @@ func (*FollowCURD) InsertFollowRelation(userId int64, targetId int64) (bool, err
 		Cancel:     0,
 	}
 	if err := DB.Select("UserId", "FollowerId", "Cancel").Create(&followInsert).Error; nil != err {
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return false, err
 	}
 	return true, nil
@@ -96,7 +96,7 @@ func (*FollowCURD) FindEverFollowing(userId int64, targetId int64) (*Follow, err
 		if "record not found" == err.Error() {
 			return nil, nil
 		}
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return nil, err
 	}
 
@@ -108,7 +108,7 @@ func (*FollowCURD) UpdateFollowRelation(userId int64, targetId int64, cancel int
 	if err := DB.Model(Follow{}).
 		Where("user_id = ? and follower_id = ?", userId, targetId).
 		Update("cancel", cancel).Error; nil != err {
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return false, err
 	}
 	return true, nil
@@ -123,7 +123,7 @@ func (*FollowCURD) GetFollowingList(userId int64) ([]int64, error) {
 		if "record not found" == err.Error() {
 			return nil, nil
 		}
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return nil, err
 	}
 	return ids, nil
@@ -139,7 +139,7 @@ func (*FollowCURD) GetFollowersList(userId int64) ([]int64, error) {
 		if "record not found" == err.Error() {
 			return nil, nil
 		}
-		log.Println(err.Error())
+		util.Log.Error(err.Error())
 		return nil, err
 	}
 	return ids, nil
