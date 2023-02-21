@@ -241,40 +241,40 @@ func updateRedisWithDel(userId int64, targetId int64) (bool, error) {
 }
 
 // GetFollowing 根据当前用户id来查询他的关注者列表。
-func (f *FollowImpl) getFollowing(userId int64) ([]User, error) {
-	// 获取关注对象的id数组。
-	ids, err := repository.NewFollowRepo().GetFollowingList(userId)
-	// 查询出错
-	if nil != err {
-		return nil, err
-	}
-	// 没得关注者
-	if nil == ids {
-		return nil, nil
-	}
-	// 根据每个id来查询用户信息。
-	len := len(ids)
-	if len > 0 {
-		len -= 1
-	}
-	var wg sync.WaitGroup
-	wg.Add(len)
-	users := make([]User, len)
-	i, j := 0, 0
-	for ; i < len; j++ {
-		if ids[j] == -1 {
-			continue
-		}
-		go func(i int, idx int64) {
-			defer wg.Done()
-			users[i], _ = f.GetUserByIdWithCurId(idx, userId)
-		}(i, ids[i])
-		i++
-	}
-	wg.Wait()
-	// 返回关注对象列表。
-	return users, nil
-}
+//func (f *FollowImpl) getFollowing(userId int64) ([]User, error) {
+//	// 获取关注对象的id数组。
+//	ids, err := repository.NewFollowRepo().GetFollowingList(userId)
+//	// 查询出错
+//	if nil != err {
+//		return nil, err
+//	}
+//	// 没得关注者
+//	if nil == ids {
+//		return nil, nil
+//	}
+//	// 根据每个id来查询用户信息。
+//	len := len(ids)
+//	if len > 0 {
+//		len -= 1
+//	}
+//	var wg sync.WaitGroup
+//	wg.Add(len)
+//	users := make([]User, len)
+//	i, j := 0, 0
+//	for ; i < len; j++ {
+//		if ids[j] == -1 {
+//			continue
+//		}
+//		go func(i int, idx int64) {
+//			defer wg.Done()
+//			users[i], _ = f.GetUserByIdWithCurId(idx, userId)
+//		}(i, ids[i])
+//		i++
+//	}
+//	wg.Wait()
+//	// 返回关注对象列表。
+//	return users, nil
+//}
 
 // GetFollowing 根据当前用户id来查询他的关注者列表。
 func (f *FollowImpl) GetFollowing(userId int64) ([]User, error) {
@@ -305,20 +305,22 @@ func setRedisFollowing(userId int64, users []User) {
 
 // 从数据库查所有关注用户信息。
 func getFollowing(userId int64) ([]User, error) {
-	users := make([]User, 1)
-	// 查询出错。
-	if err := repository.DB.Raw("select id,`username`,"+
-		"\ncount(if(tag = 'follower' and cancel is not null,1,null)) follower_count,"+
-		"\ncount(if(tag = 'follow' and cancel is not null,1,null)) follow_count,"+
-		"\n 'true' is_follow\nfrom\n("+
-		"\nselect f1.follower_id fid,u.id,`username`,f2.cancel,'follower' tag"+
-		"\nfrom follows f1 join users u on f1.user_id = u.id and f1.cancel = 0"+
-		"\nleft join follows f2 on u.id = f2.user_id and f2.cancel = 0\n\tunion all"+
-		"\nselect f1.follower_id fid,u.id,`username`,f2.cancel,'follow' tag"+
-		"\nfrom follows f1 join users u on f1.user_id = u.id and f1.cancel = 0"+
-		"\nleft join follows f2 on u.id = f2.follower_id and f2.cancel = 0\n) T"+
-		"\nwhere fid = ? group by fid,id,`username`", userId).Scan(&users).Error; nil != err {
-		return nil, err
+	followingLists, err := repository.NewFollowRepo().GetFollowingList(userId)
+	if err != nil {
+		return make([]User, 1), err
+	}
+	if len(followingLists) == 0 {
+		return make([]User, 1), nil
+	}
+	users := make([]User, 0)
+	// 遍历id列表，得到user对象，添加到user切片中
+	for _, following := range followingLists {
+		UserImpl := new(UserImpl)
+		user, err := UserImpl.GetUserById(following)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
 	}
 	// 返回关注对象列表。
 	return users, nil
@@ -326,19 +328,29 @@ func getFollowing(userId int64) ([]User, error) {
 
 // GetFollowers 根据当前用户id来查询他的粉丝列表。
 
-func (f *FollowImpl) getFollowers(userId int64) ([]User, error) {
+func GetFollowers(userId int64) ([]User, error) {
 	// 获取粉丝的id数组。
 	ids, err := repository.NewFollowRepo().GetFollowersList(userId)
 	// 查询出错
 	if nil != err {
-		return nil, err
+		return make([]User, 1), err
 	}
 	// 没得粉丝
-	if nil == ids {
-		return nil, nil
+	if len(ids) == 0 {
+		return make([]User, 1), nil
 	}
+	users := make([]User, 0)
 	// 根据每个id来查询用户信息。
-	return f.getUserById(ids, userId)
+	// 遍历id列表，得到user对象，添加到user切片中
+	for _, follower := range ids {
+		userImpl := new(UserImpl)
+		user, err := userImpl.GetUserById(follower)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
 }
 func (f *FollowImpl) getUserById(ids []int64, userId int64) ([]User, error) {
 	len := len(ids)
@@ -368,7 +380,7 @@ func (f *FollowImpl) getUserById(ids []int64, userId int64) ([]User, error) {
 
 // GetFollowers 根据当前用户id来查询他的粉丝列表。
 func (f *FollowImpl) GetFollowers(userId int64) ([]User, error) {
-	return getFollowers(userId)
+	return GetFollowers(userId)
 	/*// 先查Redis，看是否有全部粉丝信息。
 	followersIdStr := strconv.Itoa(int(userId))
 	if cnt, _ := middleware.RdbFollowers.SCard(middleware.Ctx, followersIdStr).Result(); 0 == cnt {
@@ -406,31 +418,31 @@ func (f *FollowImpl) GetFollowers(userId int64) ([]User, error) {
 }
 
 // 从数据库查所有粉丝信息。
-func getFollowers(userId int64) ([]User, error) {
-	users := make([]User, 1)
-
-	if err := repository.DB.Raw("select T.id,T.username,T.follow_cnt follow_count,T.follower_cnt follower_count,if(f.cancel is null,'false','true') is_follow"+
-		"\nfrom follows f right join"+
-		"\n(select fid,id,`username`,"+
-		"\ncount(if(tag = 'follower' and cancel is not null,1,null)) follower_cnt,"+
-		"\ncount(if(tag = 'follow' and cancel is not null,1,null)) follow_cnt"+
-		"\nfrom("+
-		"\nselect f1.user_id fid,u.id,`username`,f2.cancel,'follower' tag"+
-		"\nfrom follows f1 join users u on f1.follower_id = u.id and f1.cancel = 0"+
-		"\nleft join follows f2 on u.id = f2.user_id and f2.cancel = 0"+
-		"\nunion all"+
-		"\nselect f1.user_id fid,u.id,`username`,f2.cancel,'follow' tag"+
-		"\nfrom follows f1 join users u on f1.follower_id = u.id and f1.cancel = 0"+
-		"\nleft join follows f2 on u.id = f2.follower_id and f2.cancel = 0"+
-		"\n) T group by fid,id,`username`"+
-		"\n) T on f.user_id = T.id and f.follower_id = T.fid and f.cancel = 0 where fid = ?", userId).
-		Scan(&users).Error; nil != err {
-		// 查询出错。
-		return nil, err
-	}
-	// 查询成功。
-	return users, nil
-}
+//func getFollowers(userId int64) ([]User, error) {
+//	users := make([]User, 1)
+//
+//	if err := repository.DB.Raw("select T.id,T.username,T.follow_cnt follow_count,T.follower_cnt follower_count,if(f.cancel is null,'false','true') is_follow"+
+//		"\nfrom follows f right join"+
+//		"\n(select fid,id,`username`,"+
+//		"\ncount(if(tag = 'follower' and cancel is not null,1,null)) follower_cnt,"+
+//		"\ncount(if(tag = 'follow' and cancel is not null,1,null)) follow_cnt"+
+//		"\nfrom("+
+//		"\nselect f1.user_id fid,u.id,`username`,f2.cancel,'follower' tag"+
+//		"\nfrom follows f1 join users u on f1.follower_id = u.id and f1.cancel = 0"+
+//		"\nleft join follows f2 on u.id = f2.user_id and f2.cancel = 0"+
+//		"\nunion all"+
+//		"\nselect f1.user_id fid,u.id,`username`,f2.cancel,'follow' tag"+
+//		"\nfrom follows f1 join users u on f1.follower_id = u.id and f1.cancel = 0"+
+//		"\nleft join follows f2 on u.id = f2.follower_id and f2.cancel = 0"+
+//		"\n) T group by fid,id,`username`"+
+//		"\n) T on f.user_id = T.id and f.follower_id = T.fid and f.cancel = 0 where fid = ?", userId).
+//		Scan(&users).Error; nil != err {
+//		// 查询出错。
+//		return nil, err
+//	}
+//	// 查询成功。
+//	return users, nil
+//}
 
 // 设置Redis关于所有粉丝的信息
 func setRedisFollowers(userId int64, users []User) {
