@@ -111,6 +111,12 @@ func (usi *UserImpl) GetUserById(id int64) (User, error) {
 		log.Println("followercnt failed")
 		return User{}, err
 	}
+	isfollowing, err := followImpl.IsFollowing(id, id)
+	if err != nil {
+		log.Println("Err:", err.Error())
+		log.Println("GetIsFollowing failed")
+		return User{}, err
+	}
 	likeServiceImpl := new(LikeServiceImpl)
 	totalfavouritecount, err := likeServiceImpl.TotalFavourite(id)
 	if err != nil {
@@ -124,13 +130,12 @@ func (usi *UserImpl) GetUserById(id int64) (User, error) {
 		log.Println("Get favourite video count failed")
 		return User{}, err
 	}
-	// TODO Else 5 items needed to add
 	user = User{
 		Id:              id,
 		Name:            tableUser.Username,
 		FollowCount:     followingcnt,
 		FollowerCount:   followercnt,
-		IsFollow:        false,
+		IsFollow:        isfollowing,
 		TotalFavorite:   totalfavouritecount,
 		FavoriteCount:   favouritevideocount,
 		AvatarUrl:       AvatarById(id),
@@ -189,7 +194,6 @@ func (usi *UserImpl) GetUserByIdWithCurId(id int64, curId int64) (User, error) {
 		log.Println("Get favourite video count failed")
 		return User{}, err
 	}
-	// TODO Else 5 items needed to add
 	user = User{
 		Id:              id,
 		Name:            tableUser.Username,

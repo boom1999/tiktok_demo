@@ -67,15 +67,25 @@ func (f *FriendListImpl) GetFriendListByUserId(id int64) ([]FriendUser, error) {
 			}
 			//判断是接收消息还是发送消息
 			var msgType int64
-			if list[len(list)-1].From_user_id == following.Id {
+			if len(list) != 0 && list[len(list)-1].From_user_id == following.Id {
 				msgType = 0 //接收消息
 			} else {
 				msgType = 1
 			}
-			friend := FriendUser{
-				User:     frienduser,
-				Messages: list[len(list)-1].Content,
-				MsgType:  msgType,
+			msgType = 1
+			var friend FriendUser
+			if len(list) == 0 {
+				friend = FriendUser{
+					User:     frienduser,
+					Messages: "",
+					MsgType:  msgType,
+				}
+			} else {
+				friend = FriendUser{
+					User:     frienduser,
+					Messages: list[len(list)-1].Content,
+					MsgType:  msgType,
+				}
 			}
 
 			FriendList = append(FriendList, friend)
