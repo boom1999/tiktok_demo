@@ -3,6 +3,7 @@ package service
 import (
 	"log"
 	"strconv"
+
 	"tiktok_demo/repository"
 	"tiktok_demo/util"
 )
@@ -208,7 +209,7 @@ func (usi *UserImpl) GetUserByIdWithCurId(id int64, curId int64) (User, error) {
 	return user, nil
 }
 
-// 随机生成头像
+// AvatarById 随机生成头像
 func AvatarById(id int64) string {
 	return "https://api.multiavatar.com/" + strconv.FormatInt(id, 10) + ".png?apikey=uRiGCxXZwPK9h4"
 }

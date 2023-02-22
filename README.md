@@ -33,10 +33,13 @@
 ├─ controller（处理客户端请求的控制层）
 │    ├─ comment.go
 │    ├─ follow.go
+│    ├─ friendList.go
 │    ├─ like.go
-│    ├─ video.go
+│    ├─ message.go
 │    ├─ user.go
-│    └─ others(etc., publish && message)
+│    └─ video.go
+├─ logFile
+│    └─ tiktok_demo.log（日志存储文件）
 ├─ middleware（中间件）
 │    ├─ jwt
 │    │    └─ Auth.go
@@ -74,6 +77,7 @@
 │    ├─ video.go
 │    └─ messgae.go
 ├─ util（工具类）
+│    ├─ log.go
 │    └─ util.go
 ├─ .gitignore
 ├─ docker-compose.yml（多容器管理）

@@ -2,6 +2,8 @@ package main
 
 import (
 	"log"
+
+	"github.com/gin-gonic/gin"
 	"tiktok_demo/config"
 	"tiktok_demo/middleware/minio"
 	"tiktok_demo/middleware/rabbitmq"
@@ -9,8 +11,6 @@ import (
 	"tiktok_demo/repository"
 	"tiktok_demo/routes"
 	"tiktok_demo/util"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -26,11 +26,11 @@ func main() {
 
 func Init() {
 	config.LoadConfig()
+	util.LogConfig()
 	repository.InitDataBase()
 	minio.InitMinio()
 	redis.InitRedis()
 	rabbitmq.InitRabbitMQ()
 	rabbitmq.InitFollowRabbitMQ()
 	rabbitmq.InitLikeRabbitMQ()
-	util.LogConfig() // 初始化日志配置
 }

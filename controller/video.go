@@ -1,13 +1,14 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"tiktok_demo/service"
 	"tiktok_demo/util"
-	"time"
 )
 
 type FeedResponse struct {
@@ -124,14 +125,9 @@ func PublishList(c *gin.Context) {
 // GetVideo 拼装videoService
 func GetVideo() service.VideoServiceImpl {
 	var userService service.UserImpl
-	//var followService service.FollowServiceImp
 	var videoService service.VideoServiceImpl
 	var likeService service.LikeServiceImpl
 	var commentService service.CommentServiceImpl
-	//userService.FollowService = &followService
-	//userService.LikeService = &likeService
-	//followService.UserService = &userService
-	//likeService.VideoService = &videoService
 	commentService.UserService = &userService
 	videoService.CommentService = &commentService
 	videoService.LikeService = &likeService

@@ -2,10 +2,11 @@ package rabbitmq
 
 import (
 	"fmt"
-	"github.com/streadway/amqp"
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/streadway/amqp"
 	"tiktok_demo/middleware/redis"
 	"tiktok_demo/repository"
 )

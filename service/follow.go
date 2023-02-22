@@ -4,11 +4,12 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
+
 	"tiktok_demo/middleware/rabbitmq"
 	"tiktok_demo/middleware/redis"
 	"tiktok_demo/repository"
 	"tiktok_demo/util"
-	"time"
 )
 
 type FollowImpl struct {
@@ -241,42 +242,6 @@ func updateRedisWithDel(userId int64, targetId int64) (bool, error) {
 }
 
 // GetFollowing 根据当前用户id来查询他的关注者列表。
-//func (f *FollowImpl) getFollowing(userId int64) ([]User, error) {
-//	// 获取关注对象的id数组。
-//	ids, err := repository.NewFollowRepo().GetFollowingList(userId)
-//	// 查询出错
-//	if nil != err {
-//		return nil, err
-//	}
-//	// 没得关注者
-//	if nil == ids {
-//		return nil, nil
-//	}
-//	// 根据每个id来查询用户信息。
-//	len := len(ids)
-//	if len > 0 {
-//		len -= 1
-//	}
-//	var wg sync.WaitGroup
-//	wg.Add(len)
-//	users := make([]User, len)
-//	i, j := 0, 0
-//	for ; i < len; j++ {
-//		if ids[j] == -1 {
-//			continue
-//		}
-//		go func(i int, idx int64) {
-//			defer wg.Done()
-//			users[i], _ = f.GetUserByIdWithCurId(idx, userId)
-//		}(i, ids[i])
-//		i++
-//	}
-//	wg.Wait()
-//	// 返回关注对象列表。
-//	return users, nil
-//}
-
-// GetFollowing 根据当前用户id来查询他的关注者列表。
 func (f *FollowImpl) GetFollowing(userId int64) ([]User, error) {
 	return getFollowing(userId)
 }
@@ -381,95 +346,4 @@ func (f *FollowImpl) getUserById(ids []int64, userId int64) ([]User, error) {
 // GetFollowers 根据当前用户id来查询他的粉丝列表。
 func (f *FollowImpl) GetFollowers(userId int64) ([]User, error) {
 	return GetFollowers(userId)
-	/*// 先查Redis，看是否有全部粉丝信息。
-	followersIdStr := strconv.Itoa(int(userId))
-	if cnt, _ := middleware.RdbFollowers.SCard(middleware.Ctx, followersIdStr).Result(); 0 == cnt {
-		users, _ := f.getFollowers(userId)
-
-		go setRedisFollowers(userId, users)
-
-		return users, nil
-	}
-	// Redis中有。
-	// 先更新有效期。
-	middleware.RdbFollowers.Expire(middleware.Ctx, followersIdStr, expireTime)
-	userIds, _ := middleware.RdbFollowers.SMembers(middleware.Ctx, followersIdStr).Result()
-	len := len(userIds)
-	if len > 0 {
-		len -= 1
-	}
-	users := make([]User, len)
-	var wg sync.WaitGroup
-	wg.Add(len)
-	i, j := 0, 0
-	for ; i < len; j++ {
-		idx, _ := strconv.Atoi(userIds[j])
-		if idx == -1 {
-			continue
-		}
-		go func(i int, idx int) {
-			defer wg.Done()
-			users[i], _ = f.GetUserByIdWithCurId(int64(idx), userId)
-		}(i, idx)
-		i++
-	}
-	wg.Wait()
-	return users, nil*/
-}
-
-// 从数据库查所有粉丝信息。
-//func getFollowers(userId int64) ([]User, error) {
-//	users := make([]User, 1)
-//
-//	if err := repository.DB.Raw("select T.id,T.username,T.follow_cnt follow_count,T.follower_cnt follower_count,if(f.cancel is null,'false','true') is_follow"+
-//		"\nfrom follows f right join"+
-//		"\n(select fid,id,`username`,"+
-//		"\ncount(if(tag = 'follower' and cancel is not null,1,null)) follower_cnt,"+
-//		"\ncount(if(tag = 'follow' and cancel is not null,1,null)) follow_cnt"+
-//		"\nfrom("+
-//		"\nselect f1.user_id fid,u.id,`username`,f2.cancel,'follower' tag"+
-//		"\nfrom follows f1 join users u on f1.follower_id = u.id and f1.cancel = 0"+
-//		"\nleft join follows f2 on u.id = f2.user_id and f2.cancel = 0"+
-//		"\nunion all"+
-//		"\nselect f1.user_id fid,u.id,`username`,f2.cancel,'follow' tag"+
-//		"\nfrom follows f1 join users u on f1.follower_id = u.id and f1.cancel = 0"+
-//		"\nleft join follows f2 on u.id = f2.follower_id and f2.cancel = 0"+
-//		"\n) T group by fid,id,`username`"+
-//		"\n) T on f.user_id = T.id and f.follower_id = T.fid and f.cancel = 0 where fid = ?", userId).
-//		Scan(&users).Error; nil != err {
-//		// 查询出错。
-//		return nil, err
-//	}
-//	// 查询成功。
-//	return users, nil
-//}
-
-// 设置Redis关于所有粉丝的信息
-func setRedisFollowers(userId int64, users []User) {
-	/*
-		1-设置followers_userId的所有粉丝id。
-		2-设置following_part_id关注信息。
-	*/
-	// 加上-1防止脏读。
-	followersIdStr := strconv.Itoa(int(userId))
-	redis.RdbFollowers.SAdd(redis.Ctx, followersIdStr, -1)
-	// 设置过期时间
-	redis.RdbFollowers.Expire(redis.Ctx, followersIdStr, expireTime)
-	for i, user := range users {
-		redis.RdbFollowers.SAdd(redis.Ctx, followersIdStr, user.Id)
-
-		userUserIdStr := strconv.Itoa(int(user.Id))
-		redis.RdbFollowingPart.SAdd(redis.Ctx, userUserIdStr, userId)
-		redis.RdbFollowingPart.SAdd(redis.Ctx, userUserIdStr, -1)
-		// 随机更新过期时间
-		redis.RdbFollowingPart.Expire(redis.Ctx, userUserIdStr, expireTime+
-			time.Duration((i%10)<<8))
-
-		if user.IsFollow {
-			redis.RdbFollowingPart.SAdd(redis.Ctx, followersIdStr, user.Id)
-			redis.RdbFollowingPart.SAdd(redis.Ctx, followersIdStr, -1)
-			redis.RdbFollowingPart.Expire(redis.Ctx, followersIdStr, expireTime+
-				time.Duration((i%10)<<8))
-		}
-	}
 }

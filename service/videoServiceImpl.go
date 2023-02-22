@@ -3,19 +3,20 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/u2takey/ffmpeg-go"
-	"go.uber.org/zap"
 	"io"
 	"mime/multipart"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/u2takey/ffmpeg-go"
+	"go.uber.org/zap"
 	"tiktok_demo/config"
 	"tiktok_demo/repository"
 	"tiktok_demo/util"
-	"time"
 )
 
 type VideoServiceImpl struct {
@@ -265,22 +266,6 @@ func (videoService *VideoServiceImpl) GetVideoIdList(authorId int64) ([]int64, e
 	}
 	return id, nil
 }
-
-/*func GetImageFile(videoPath string) (string, error) {
-	temp := strings.Split(videoPath, "/")
-	videoName := temp[len(temp)-1]
-	b := []byte(videoName)
-	videoName = string(b[:len(b)-3]) + "jpg"
-	picpath := "/tmp/file/picture/"
-	picName := filepath.Join(picpath, videoName)
-	cmd := exec.Command("ffmpeg", "-i", videoPath, "-ss", "1", "-f", "image2", "-t", "0.01", "-y", picName)
-	err := cmd.Run()
-	if err != nil {
-		return "", err
-	}
-
-	return videoName, nil
-}*/
 
 func Getimagestream(inputFile string) (io.Reader, int64, error) {
 	// 设置 FFmpeg 参数及运行

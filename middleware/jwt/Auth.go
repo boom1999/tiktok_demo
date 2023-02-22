@@ -8,9 +8,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
+
 	"tiktok_demo/config"
 	"tiktok_demo/service"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"

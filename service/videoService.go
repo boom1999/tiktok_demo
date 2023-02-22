@@ -2,8 +2,9 @@ package service
 
 import (
 	"mime/multipart"
-	"tiktok_demo/repository"
 	"time"
+
+	"tiktok_demo/repository"
 )
 
 type Video struct {

@@ -4,11 +4,12 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
+
 	"tiktok_demo/config"
 	"tiktok_demo/repository"
 	"tiktok_demo/service"
 	"tiktok_demo/util"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

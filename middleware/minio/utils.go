@@ -2,11 +2,12 @@ package minio
 
 import (
 	"context"
-	"github.com/minio/minio-go/v7"
 	"io"
 	"log"
 	"net/url"
 	"time"
+
+	"github.com/minio/minio-go/v7"
 )
 
 // 判断存储桶是否存在
@@ -42,20 +43,6 @@ func CreateBucket(bucketName string) error {
 	}
 	return nil
 }
-
-/*// UploadLocalFile 上传本地文件（提供文件路径）至 minio
-func UploadLocalFile(bucketName string, objectName string, filePath string, contentType string) (int64, error) {
-	ctx := context.Background()
-	info, err := minioClient.FPutObject(ctx, bucketName, objectName, filePath, minio.PutObjectOptions{
-		ContentType: contentType,
-	})
-	if err != nil {
-		log.Printf("localfile upload failed, %s", err)
-		return 0, err
-	}
-	log.Printf("upload %s of size %d successfully", objectName, info.Size)
-	return info.Size, nil
-}*/
 
 // UploadFile 上传文件（提供reader）至 minio
 func UploadFile(bucketName string, objectName string, reader io.Reader, contentType string, objectSize int64) error {

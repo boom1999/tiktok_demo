@@ -24,7 +24,8 @@ func (comment Comment) TableName() string {
 }
 
 // Count
-//  查询
+//
+//	查询
 func Count(videoId int64) (int64, error) {
 	util.Log.Debug("CommentDao-Count: running")
 	//InitDataBase()

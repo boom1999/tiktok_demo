@@ -1,11 +1,12 @@
 package service
 
 import (
-	"tiktok_demo/repository"
 	"time"
+
+	"tiktok_demo/repository"
 )
 
-//  接口定义
+// 接口定义
 type CommentService interface {
 	// CountFromVideoId
 	CountFromVideoId(id int64) (int64, error)

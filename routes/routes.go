@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"github.com/gin-gonic/gin"
 	"tiktok_demo/controller"
 	"tiktok_demo/middleware/jwt"
-	"github.com/gin-gonic/gin"
 )
 
 func CollectRoutes(r *gin.Engine) *gin.Engine {

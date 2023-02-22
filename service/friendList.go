@@ -20,7 +20,7 @@ var (
 	friendListOnce sync.Once
 )
 
-// NewFSIInstance 生成并返回FollowServiceImp结构体单例变量。
+// NewFLInstance 生成并返回FollowServiceImp结构体单例变量。
 func NewFLInstance() *FriendListImpl {
 	friendListOnce.Do(
 		func() {
@@ -29,7 +29,7 @@ func NewFLInstance() *FriendListImpl {
 	return friendListImpl
 }
 
-// 根据用户id 查询 朋友列表
+// GetFriendListByUserId 根据用户id 查询 朋友列表
 func (f *FriendListImpl) GetFriendListByUserId(id int64) ([]FriendUser, error) {
 	var FriendList []FriendUser
 	followings, err := f.GetFollowing(id)

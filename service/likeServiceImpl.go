@@ -5,12 +5,13 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
+
 	"tiktok_demo/config"
 	"tiktok_demo/middleware/rabbitmq"
 	"tiktok_demo/middleware/redis"
 	"tiktok_demo/repository"
 	"tiktok_demo/util"
-	"time"
 )
 
 type LikeServiceImpl struct {
