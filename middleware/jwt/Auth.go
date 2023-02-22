@@ -109,6 +109,32 @@ func Auth() gin.HandlerFunc {
 	}
 }
 
+// Auth for form token
+func AuthForm() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token, _ := ctx.GetPostForm("token")
+		if token == "" {
+			ctx.Abort()
+			ctx.JSON(http.StatusUnauthorized, Response{
+				StatusCode: -1,
+				StatusMsg:  "Unauthorized",
+			})
+		}
+		userId, err := VerifyToken(token)
+		if err != nil || userId == "0" {
+			ctx.Abort()
+			ctx.JSON(http.StatusUnauthorized, Response{
+				StatusCode: -1,
+				StatusMsg:  "Token Error",
+			})
+		} else {
+			log.Println("token good, userId: ", userId)
+		}
+		ctx.Set("userId", userId)
+		ctx.Next()
+	}
+}
+
 // AuthWithoutLogin Actions that do not require login
 func AuthWithoutLogin() gin.HandlerFunc {
 	return func(ctx *gin.Context) {

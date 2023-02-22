@@ -26,10 +26,13 @@ func Feed(c *gin.Context) {
 	inputTime := c.Query("latest_time")
 	util.Log.Debug("debug", zap.String("acquired latest_time", inputTime))
 	var lastTime time.Time
-	if inputTime != "0" {
+	if (inputTime != "0") && (inputTime != "") {
 		me, _ := strconv.ParseInt(inputTime, 10, 64)
 		lastTime = time.Unix(me, 0)
 	} else {
+		lastTime = time.Now()
+	}
+	if lastTime.Year() > time.Now().Year() {
 		lastTime = time.Now()
 	}
 	util.Log.Debug("debug", zap.Time("acquired timestamp", lastTime))
@@ -63,10 +66,18 @@ func Publish(c *gin.Context) {
 		})
 		return
 	}
-
+	title, _ := c.GetPostForm("title")
+	if err != nil {
+		util.Log.Error("acquired video streaming failed" + err.Error())
+		c.JSON(http.StatusOK, Response{
+			StatusCode: 1,
+			StatusMsg:  err.Error(),
+		})
+		return
+	}
 	userId, _ := strconv.ParseInt(c.GetString("userId"), 10, 64)
 	util.Log.Debug("debug", zap.Int64("acquired userId", userId))
-	title := c.PostForm("title")
+	//title := c.PostForm("title")
 	util.Log.Debug("debug", zap.String("acquired video title", title))
 
 	videoService := GetVideo()
