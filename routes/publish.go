@@ -9,7 +9,7 @@ import (
 func Publish(r *gin.RouterGroup) {
 	publish := r.Group("/publish")
 	{
-		publish.POST("/action/", jwt.Auth(), controller.Publish)
+		publish.POST("/action/", jwt.AuthForm(), controller.Publish)
 		publish.GET("/list/", jwt.Auth(), controller.PublishList)
 	}
 }
