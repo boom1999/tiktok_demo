@@ -3,7 +3,7 @@
 
 ## Tiktok Demo
 
-### *Updating*
+### Simple version of tiktok backend service
 
 ![GitHub Repo stars](https://img.shields.io/github/stars/boom1999/tiktok_demo??style=plastic)
 ![GitHub watchers](https://img.shields.io/github/watchers/boom1999/tiktok_demo??style=plastic)
@@ -107,8 +107,9 @@
 - Step 3. Install `Docker` and `docker-compose`
   - Install `Docker`: 
     ``` shell
-    curl -fsSL https://get.docker.com | bash -s docker`, also you can add `--mirror Aliyun
+    curl -fsSL https://get.docker.com | bash -s docker
     ```
+    also you can add `--mirror Aliyun`
   - Start docker service: `systemctl start docker`
   - Download `docker-compose`
     ```shell
@@ -160,3 +161,6 @@ docker image prune
 - For mysql connection
   > If you are deploying on a remote **ECS** instead of a **virtual machine** and want to connect through tools such as _Navicat_,
   > please make sure that mysql has enabled the remote connection permission for the _user_ or _root_(if not enabled, it will not affect data reading and writing).
+
+- Todo
+  - Simplify the startup steps and integrate into `Makefile`
